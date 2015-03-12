@@ -1,0 +1,12 @@
+name: ChatGuard
+main: ru.Den_Abr.ChatGuard.ChatGuardPlugin
+version: 6.5
+author: Den_Abr
+website: http://best-minecraft.ru/
+description: Guard for your chat
+softdepend: [ProtocolLib, BKCommonLib, AuthMe, xAuth, LoginSecurity]
+commands:
+    cg:
+       description: ChatGuard commands.
+       usage: /<command>
+       aliases: [chatguard]
