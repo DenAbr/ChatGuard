@@ -8,4 +8,9 @@ public class xAuth extends Integrator {
 		return de.luricos.bukkit.xAuth.xAuth.getPlugin().getPlayerManager()
 				.getPlayer(p).isAuthenticated();
 	}
+
+	@Override
+	public String getName() {
+		return "xAuth";
+	}
 }

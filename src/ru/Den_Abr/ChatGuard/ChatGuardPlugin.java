@@ -84,8 +84,9 @@ public class ChatGuardPlugin extends JavaPlugin {
 			@Override
 			public List<String> onTabComplete(CommandSender arg0, Command arg1,
 					String arg2, String[] arg3) {
-				if(arg3.length == 1) {
-					return (List<String>) StringUtil.copyPartialMatches(arg3[0], subComs, new ArrayList<String>());
+				if (arg3.length == 1) {
+					return (List<String>) StringUtil.copyPartialMatches(
+							arg3[0], subComs, new ArrayList<String>());
 				}
 				return null;
 			}
@@ -95,27 +96,24 @@ public class ChatGuardPlugin extends JavaPlugin {
 	private void setupAuth() {
 		if (null != getServer().getPluginManager().getPlugin("AuthMe")) {
 			Plugin pl = getServer().getPluginManager().getPlugin("AuthMe");
-			if (pl.getDescription().getAuthors().contains("whoami")) {
-				Integrator.isAuthMeAncient = true;
-			} else {
-				Integrator.isAuthMeReloaded = true;
-			}
-			getLogger()
-					.info("AuthMe "
-							+ (Integrator.isAuthMeAncient ? "Ancient"
-									: "Reloaded")
-							+ " is hooked. Player will be checked after login.");
+			Integrator.isAuthMeAncient = pl.getDescription().getAuthors()
+					.contains("whoami");
+			Integrator.isAuthMeReloaded = !pl.getDescription().getAuthors().contains("whoami");
 		} else if (null != getServer().getPluginManager().getPlugin("xAuth")) {
 			Integrator.isXAuth = true;
-			getLogger().info(
-					"xAuth is hooked. Player will be checked after login.");
 		} else if (null != getServer().getPluginManager().getPlugin(
 				"LoginSecurity")) {
 			Integrator.isLoginSecurity = true;
-			getLogger()
-					.info("LoginSecurity is hooked. Player will be checked after login.");
 		}
+
 		in = Integrator.getIntegrator();
+		getLogger().info(
+				in.getName()
+						+ " is hooked. Players will be checked after login.");
+	}
+
+	public static ChatGuardPlugin getInstance() {
+		return plugin;
 	}
 
 	private boolean setupProtocol() {
@@ -217,7 +215,8 @@ public class ChatGuardPlugin extends JavaPlugin {
 				+ ChatColor.GOLD + " - Toggle global muting.");
 		help[12] = (ChatColor.GRAY + "/" + arg2 + " clear" + ChatColor.GOLD + " - clear warnings.");
 		help[13] = (ChatColor.GRAY + "/" + arg2 + " reload" + ChatColor.GOLD + " - reload ChatGuard.");
-		if (a.length == 0 || !subComs.contains(a[0].toLowerCase()) || a[0].equalsIgnoreCase("help")) {
+		if (a.length == 0 || !subComs.contains(a[0].toLowerCase())
+				|| a[0].equalsIgnoreCase("help")) {
 			s.sendMessage(help);
 			return true;
 		}

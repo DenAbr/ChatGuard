@@ -8,4 +8,9 @@ public class LoginSecurity extends Integrator {
 		return !com.lenis0012.bukkit.ls.LoginSecurity.instance.authList.containsKey(p.getName());
 	}
 
+	@Override
+	public String getName() {
+		return "LoginSecurity";
+	}
+
 }

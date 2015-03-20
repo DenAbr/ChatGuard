@@ -2,6 +2,8 @@ package ru.Den_Abr.ChatGuard.Types;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public class SubCommandSet {
 	private HashMap<String, SubCommand> subCommands = new HashMap<String, SubCommand>();
@@ -22,6 +24,10 @@ public class SubCommandSet {
 
 	public Collection<SubCommand> getCommands() {
 		return subCommands.values();
+	}
+
+	public Set<String> getNames() {
+		return subCommands.keySet();
 	}
 
 	public boolean contains(String sub) {

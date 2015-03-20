@@ -12,9 +12,9 @@ public @interface Cmd {
 
 	String vals();
 
-	int max() default 0;
+	int max() default 1;
 
-	int min() default -1;
+	int min() default 0;
 
 	String desc();
 

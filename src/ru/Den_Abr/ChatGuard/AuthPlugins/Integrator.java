@@ -26,4 +26,7 @@ public abstract class Integrator {
 	}
 
 	public abstract boolean isLogged(Player p);
+	public abstract String getName() ;
+
+
 }

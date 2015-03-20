@@ -9,4 +9,10 @@ public class AuthMe extends Integrator {
 	public boolean isLogged(Player p) {
 		return PlayerCache.getInstance().isAuthenticated(p.getName());
 	}
+
+	@Override
+	public String getName() {
+		return "AuthMe Ancient";
+	}
+
 }
