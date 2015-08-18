@@ -1,10 +1,9 @@
 name: ChatGuard
 main: ru.Den_Abr.ChatGuard.ChatGuardPlugin
-version: 7.0-Indev
+version: 7.0-Preview
 author: Den_Abr
-website: http://best-minecraft.ru/
 description: Guard for your chat
-softdepend: [ProtocolLib, BKCommonLib, AuthMe, xAuth, LoginSecurity]
+softdepend: [ProtocolLib, AuthMe]
 commands:
     cg:
        description: ChatGuard commands.

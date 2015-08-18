@@ -21,7 +21,7 @@ Caps settings:
     inform admins: true
     max warnings: 10
     max caps percent: 60
-    # dont check if message smaller than your value(ex. for escape checking smiles)
+    # dont check if message smaller than your value(ex. for escaping smiles)
     min message lenght: 3
 Flood settings:
     # flood messages will be cancelled in any way
@@ -32,23 +32,25 @@ Flood settings:
     flood time: 10
     # set to 0 to disable function
     message cooldown: 5
-    # 1 value means that the last player's message will be checked for flood only
+    # 1 value means that the last player's message will be checked for flood only(2 - with penultimate, etc.)
     flood levels: 1
 Spam settings:
     enabled: true
     inform admins: true
     max warnings: 10
     # use only if you know something about regular expressions
-    domain regexp: ([0-9a-z]{2,}\.)+(ru|com|org|ua|su|tv|net|biz|info|name|mobi|kz|by|lv|eu|tk)(:\d*)?
-    ip regexp: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d*)?
+    domain regexp: '([0-9a-z]{2,}\.)+(ru|com|org|ua|su|tv|net|biz|info|name|mobi|kz|by|lv|eu|tk)(:\d*)?'
+    ip regexp: '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d*)?'
     custom replacement: <spam>
     hard mode: true
+    # set how many numbers can players send in one message, 0 - disable
+    max numbers: 3
 Messages:
     # message will be modified to normal if disabled
     cancel if violation: true
     # works only if separated warnings are enabled
     replacement: <censored>
-    enable character blacklist: true
+    enable character whitelist: true
 Warnings settings:
     enabled: true
     separate: true
@@ -83,13 +85,12 @@ Punishment settings:
         spam commands:
             - kick {Player} {Reason_another}
             - broadcast {Reason_another}
-Listeners:
-    # by default plugin uses ProtcolLib to improve compatibility and performance
-    use packets: true
 Other settings:
     check signs: true
-    # to disable this set value to []
-    check commands: [/me, /msg, /tell, /w]
+    # check player's command for swearing, capsing and flooding
+    # to disable this set value to []. Number after colon means how many arguements in command we should skip
+    check commands: ['/me:0', '/msg:1', '/tell:1', '/w:1', '/r:0']
     # may be useful if you find a bug and want report it to developer
     debug level: 0
-    
+    # if traditional messages listening system doesnt work(or smth else) plugin can listen packets
+    use packets: false

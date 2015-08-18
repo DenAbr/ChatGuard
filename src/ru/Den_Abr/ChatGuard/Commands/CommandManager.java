@@ -13,8 +13,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.util.StringUtil;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
-import ru.Den_Abr.ChatGuard.Types.SubCommand;
-import ru.Den_Abr.ChatGuard.Types.SubCommandSet;
+import ru.Den_Abr.ChatGuard.Utils.SubCommandSet;
 
 public class CommandManager implements CommandExecutor {
 	private SubCommandHandler handler;
