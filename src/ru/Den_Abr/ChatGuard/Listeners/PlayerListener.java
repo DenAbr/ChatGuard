@@ -7,16 +7,16 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-public class PlayerListener implements Listener {
-	private static PlayerListener instance;
+import ru.Den_Abr.ChatGuard.ViolationInfo;
+import ru.Den_Abr.ChatGuard.ChatFilters.AbstractFilter;
+import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
-	public PlayerListener() {
-		instance = this;
-	}
+public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
-
+		ViolationInfo info = AbstractFilter.handleMessage(e.getMessage(), CGPlayer.get(e.getPlayer()));
+		e.setMessage(info.getClearMessage());
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

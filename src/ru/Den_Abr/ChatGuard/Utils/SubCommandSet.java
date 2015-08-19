@@ -35,4 +35,5 @@ public class SubCommandSet {
 		return subCommands.containsKey(sub.toLowerCase());
 	}
 
+	
 }

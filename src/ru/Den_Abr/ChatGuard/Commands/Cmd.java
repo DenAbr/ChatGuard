@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 public @interface Cmd {
 	String name();
 
-	String vals();
+	String args();
 
 	int max() default 1;
 

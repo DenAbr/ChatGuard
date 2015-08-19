@@ -57,7 +57,7 @@ public class Updater {
 	// User-agent when querying Curse
 	private static final String USER_AGENT = "Updater (by Gravity)";
 	// Used for locating version numbers in file names
-	private static final String DELIMETER = "^v|[\\s_-]v";
+	private static final String DELIMETER = " ";
 	// If the version number contains one of these, don't update.
 	private static final String[] NO_UPDATE_TAG = { "-DEV", "-PRE", "-SNAPSHOT" };
 	// Used for downloading files
@@ -303,7 +303,7 @@ public class Updater {
 			key = null;
 		}
 
-		this.apiKey = key;
+		this.apiKey = "8a873e89fcaf3189b55e0b05adc8ac70136ccd00";
 
 		try {
 			this.url = new URL(Updater.HOST + Updater.QUERY + this.id);

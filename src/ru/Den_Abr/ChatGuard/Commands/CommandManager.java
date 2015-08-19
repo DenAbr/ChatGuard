@@ -16,33 +16,38 @@ import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Utils.SubCommandSet;
 
 public class CommandManager implements CommandExecutor {
-	private SubCommandHandler handler;
+	protected static CommandManager instance;
+	protected static SubCommandHandler handler;
 	private ChatGuardPlugin plugin;
-	private SubCommandSet subComs;
+	protected SubCommandSet subComs;
 
 	public CommandManager(ChatGuardPlugin pl) {
 		handler = new SubCommandHandler();
 		plugin = pl;
 		registerCommands();
+		instance = this;
 	}
 
 	@Override
-	public boolean onCommand(CommandSender arg0, Command arg1, String arg2,
-			String[] arg3) {
+	public boolean onCommand(CommandSender arg0, Command arg1, String arg2, String[] arg3) {
 		if (arg3.length == 0) {
-			printHelp(arg0, arg2);
+			arg0.sendMessage(ChatColor.GOLD + plugin.getDescription().getName() + " v" + ChatColor.GREEN
+					+ plugin.getDescription().getVersion() + ChatColor.GOLD + " by " + ChatColor.DARK_PURPLE
+					+ plugin.getDescription().getAuthors().get(0));
 			return true;
 		}
 
 		String sub = arg3[0].toLowerCase();
 		String[] args = Arrays.copyOfRange(arg3, 1, arg3.length);
+		ChatGuardPlugin.debug(2, subComs.getNames(), sub);
 		if (!subComs.contains(sub)) {
-			arg0.sendMessage("Net comandy");
+			arg0.sendMessage("Unknown command. Type '/" + arg2 + " help' for help");
 			return true;
 		}
 		SubCommand sc = subComs.getCommand(sub);
 		if (!sc.isPermitted(arg0)) {
-			arg0.sendMessage("Net prav");
+			arg0.sendMessage(ChatColor.RED + "You don't have permissions for this command! " + ChatColor.GRAY + "("
+					+ sc.perm + ")");
 			return true;
 		}
 		if (!sc.isArgsValid(args)) {
@@ -56,42 +61,28 @@ public class CommandManager implements CommandExecutor {
 	private void registerCommands() {
 		subComs = new SubCommandSet();
 		for (Method method : handler.getClass().getDeclaredMethods()) {
-			if (method.isAnnotationPresent(Cmd.class)) {
+			if (!method.isAnnotationPresent(Cmd.class)) {
 				continue;
 			}
-			SubCommand subCommand = new SubCommand(
-					method.getAnnotation(Cmd.class));
+			ChatGuardPlugin.debug(2, method, Arrays.asList(method.getAnnotations()));
+			SubCommand subCommand = new SubCommand(method.getAnnotation(Cmd.class), method);
 			subComs.add(subCommand);
 		}
 		setTabCompleter();
 	}
 
 	private void setTabCompleter() {
-		ChatGuardPlugin.getInstance().getCommand("cg")
-				.setTabCompleter(new TabCompleter() {
+		ChatGuardPlugin.getInstance().getCommand("cg").setTabCompleter(new TabCompleter() {
 
-					@Override
-					public List<String> onTabComplete(CommandSender arg0,
-							Command arg1, String arg2, String[] arg3) {
-						if (arg3.length == 1) {
-							return (List<String>) StringUtil
-									.copyPartialMatches(arg3[0],
-											subComs.getNames(),
-											new ArrayList<String>());
-						}
-						return null;
-					}
-				});
-	}
-
-	private void printHelp(CommandSender cs, String l) {
-		cs.sendMessage(ChatColor.GOLD + plugin.getDescription().getName()
-				+ " v" + ChatColor.GREEN + plugin.getDescription().getVersion()
-				+ ChatColor.GOLD + " by " + ChatColor.DARK_PURPLE
-				+ plugin.getDescription().getAuthors().get(0));
-		for (SubCommand sc : subComs.getCommands()) {
-			sc.printHelp(cs, l);
-		}
+			@Override
+			public List<String> onTabComplete(CommandSender arg0, Command arg1, String arg2, String[] arg3) {
+				if (arg3.length == 1) {
+					return (List<String>) StringUtil.copyPartialMatches(arg3[0], subComs.getNames(),
+							new ArrayList<String>());
+				}
+				return null;
+			}
+		});
 	}
 
 }

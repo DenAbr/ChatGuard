@@ -16,6 +16,17 @@ public class SubCommand {
 	String perm;
 	Method method;
 
+	public SubCommand(Annotation ann, Method meth) {
+		Cmd cmdAnn = (Cmd) ann;
+		name = cmdAnn.name();
+		desc = cmdAnn.desc();
+		perm = cmdAnn.perm();
+		vals = cmdAnn.args();
+		max = cmdAnn.max();
+		min = cmdAnn.min();
+		method = meth;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -40,34 +51,16 @@ public class SubCommand {
 		return cs.hasPermission(perm);
 	}
 
-	public SubCommand(Annotation ann) {
-		Cmd cmdAnn = (Cmd) ann;
-		name = cmdAnn.name();
-		desc = cmdAnn.desc();
-		perm = cmdAnn.perm();
-		vals = cmdAnn.vals();
-		max = cmdAnn.max();
-		min = cmdAnn.min();
-	}
-
 	public void execute(CommandSender cs, String[] args) {
 		try {
-			method.invoke(method.getDeclaringClass(), cs, args);
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
+			method.invoke(CommandManager.handler, cs, args);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void printHelp(CommandSender arg0, String l) {
-		arg0.sendMessage(ChatColor.GOLD + "/" + l + " " + name + " " + vals
-				+ " - " + desc);
+		arg0.sendMessage(ChatColor.GOLD + "/" + l + " " + name + " " + vals + " - " + ChatColor.GRAY + desc);
 	}
 
 	public boolean isArgsValid(String[] arg3) {
