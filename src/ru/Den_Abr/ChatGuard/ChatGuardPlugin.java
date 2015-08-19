@@ -11,6 +11,8 @@ import ru.Den_Abr.ChatGuard.ChatFilters.FloodFilter;
 import ru.Den_Abr.ChatGuard.ChatFilters.SpamFilter;
 import ru.Den_Abr.ChatGuard.ChatFilters.SwearFilter;
 import ru.Den_Abr.ChatGuard.Commands.CommandManager;
+import ru.Den_Abr.ChatGuard.Integration.AbstractPlugin;
+import ru.Den_Abr.ChatGuard.Integration.AuthMe;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
@@ -34,10 +36,17 @@ public class ChatGuardPlugin extends JavaPlugin {
 		if (!setupProtocol()) {
 			getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 		}
-
+		registerIntegratedPlugins();
 		registerFilters();
 		loadOnlinePlayers();
 		getLogger().info("ChatGuard enabled!");
+	}
+
+	// you can do it from your's plugins
+	private void registerIntegratedPlugins() {
+		AbstractPlugin.getIntegratedPlugins().clear();
+		
+		new AuthMe().register();
 	}
 
 	private void loadOnlinePlayers() {
@@ -46,6 +55,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 		}
 	}
 
+	// the same as integration
 	public void registerFilters() {
 		AbstractFilter.getActiveFilters().clear();
 

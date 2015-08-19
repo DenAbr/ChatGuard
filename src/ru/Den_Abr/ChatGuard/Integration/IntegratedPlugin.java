@@ -9,5 +9,7 @@ public interface IntegratedPlugin {
 
 	public JavaPlugin getPlugin();
 	
-	public boolean register();
+	public boolean load();
+	
+	public void register();
 }
