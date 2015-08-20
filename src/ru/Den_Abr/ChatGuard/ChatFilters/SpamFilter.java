@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
-import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Settings;
 import ru.Den_Abr.ChatGuard.ViolationType;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
@@ -21,13 +20,14 @@ public class SpamFilter extends AbstractFilter {
 
 	@Override
 	public ViolationType checkMessage(String message, CGPlayer player) {
-		ChatGuardPlugin.debug(2, ipPattern, domainPattern);
 
 		if (player.hasPermission("chatguard.ignore.adv"))
 			return null;
-		Matcher ipMatcher = ipPattern.matcher(message);
-		Matcher domMatcher = domainPattern.matcher(message);
-		if(ipMatcher.find() || domMatcher.find()) {
+
+		Matcher ipMatcher = ipPattern.matcher(message.replaceAll("[^A-Za-zА-Яа-яà-ÿÀ-ß]", ""));
+		Matcher domMatcher = domainPattern.matcher(message.replaceAll("[^A-Za-zА-Яа-яà-ÿÀ-ß]", ""));
+
+		if (ipMatcher.find() || domMatcher.find()) {
 			return ViolationType.ADVERT;
 		}
 		return null;

@@ -2,6 +2,8 @@ package ru.Den_Abr.ChatGuard.ChatFilters;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +18,7 @@ import ru.Den_Abr.ChatGuard.ViolationType;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
 public class SwearFilter extends AbstractFilter {
-	private Pattern swearPattern;
+	private List<Pattern> swearPatterns;
 	private String replacement;
 	private boolean informAdmins;
 
@@ -24,9 +26,11 @@ public class SwearFilter extends AbstractFilter {
 	public ViolationType checkMessage(String message, CGPlayer player) {
 		if (player.hasPermission("chatguard.ignore.swear"))
 			return null;
-		Matcher swearMatcher = swearPattern.matcher(message);
-		if (swearMatcher.find()) {
-			return ViolationType.SWEAR;
+		for (Pattern word : swearPatterns) {
+			Matcher swearMatcher = word.matcher(message);
+			if (swearMatcher.find()) {
+				return ViolationType.SWEAR;
+			}
 		}
 		return null;
 	}
@@ -48,19 +52,23 @@ public class SwearFilter extends AbstractFilter {
 
 		try {
 			File oldFileSwear = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearlist.txt");
-			File newFileSwear = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearpattern.txt");
+			File newFileSwear = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
 			if (!newFileSwear.exists()) {
 				if (oldFileSwear.exists()) {
-					String oldLine = "(" + Files.readFirstLine(oldFileSwear, Charset.forName("UTF-8")) + ")";
-					Files.write(oldLine.getBytes(Charset.forName("UTF-8")), oldFileSwear);
-					oldFileSwear.delete();
+					String oldLine = Files.readFirstLine(oldFileSwear, Charset.forName("UTF-8")).replace('|', '\n');
+					Files.write(oldLine.getBytes(Charset.forName("UTF-8")), newFileSwear);
+					oldFileSwear.renameTo(new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearlistOLD.txt"));
+					ChatGuardPlugin.getLog().info("Moved old swearlist file");
 				} else {
-					Files.write("(your|very|bad|words|here|now|with|more|regexp|support)".getBytes(), newFileSwear);
-					ChatGuardPlugin.getInstance().getLogger().warning("Check your swearpattern.txt file!");
+					ChatGuardPlugin.getInstance().saveResource("swearwords.txt", false);
+					ChatGuardPlugin.getInstance().getLogger().warning("Check your swearwords.txt file!");
 				}
 			}
-			String line = Files.readFirstLine(newFileSwear, Charset.forName("UTF-8"));
-			swearPattern = Pattern.compile(line, Pattern.CASE_INSENSITIVE);
+			swearPatterns = new ArrayList<>();
+
+			for (String word : new ArrayList<>(Files.readLines(newFileSwear, Charset.forName("UTF-8")))) {
+				swearPatterns.add(Pattern.compile(word, Pattern.CASE_INSENSITIVE));
+			}
 			getActiveFilters().add(this);
 		} catch (Exception e) {
 			e.printStackTrace();

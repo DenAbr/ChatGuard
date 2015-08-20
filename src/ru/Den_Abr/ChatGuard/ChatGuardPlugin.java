@@ -1,5 +1,7 @@
 package ru.Den_Abr.ChatGuard;
 
+import java.util.logging.Logger;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -109,5 +111,9 @@ public class ChatGuardPlugin extends JavaPlugin {
 			return;
 		for (Object obj : o)
 			getInstance().getLogger().info("[DEBUG] " + obj.toString());
+	}
+
+	public static Logger getLog() {
+		return getInstance().getLogger();
 	}
 }
