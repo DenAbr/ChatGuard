@@ -3,6 +3,7 @@ package ru.Den_Abr.ChatGuard.ChatFilters;
 import java.util.HashSet;
 import java.util.Set;
 
+import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Settings;
 import ru.Den_Abr.ChatGuard.ViolationInfo;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;

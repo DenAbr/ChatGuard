@@ -12,7 +12,7 @@ import ru.Den_Abr.ChatGuard.ChatFilters.SpamFilter;
 import ru.Den_Abr.ChatGuard.ChatFilters.SwearFilter;
 import ru.Den_Abr.ChatGuard.Commands.CommandManager;
 import ru.Den_Abr.ChatGuard.Integration.AbstractPlugin;
-import ru.Den_Abr.ChatGuard.Integration.AuthMe;
+import ru.Den_Abr.ChatGuard.Integration.AuthMeOld;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
@@ -45,8 +45,8 @@ public class ChatGuardPlugin extends JavaPlugin {
 	// you can do it from your's plugins
 	private void registerIntegratedPlugins() {
 		AbstractPlugin.getIntegratedPlugins().clear();
-		
-		new AuthMe().register();
+
+		new AuthMeOld().register();
 	}
 
 	private void loadOnlinePlayers() {
@@ -105,7 +105,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 	}
 
 	public static void debug(int level, Object... o) {
-		if (level < Settings.getDebugLevel())
+		if (level > Settings.getDebugLevel())
 			return;
 		for (Object obj : o)
 			getInstance().getLogger().info("[DEBUG] " + obj.toString());

@@ -16,6 +16,8 @@ public class CharacterFilter extends AbstractFilter {
 
 	@Override
 	public ViolationType checkMessage(String message, CGPlayer player) {
+		if (player.hasPermission("chatguard.ignore.characters"))
+			return null;
 		for (char c : message.toCharArray()) {
 			if (isNotAllowed(c)) {
 				return ViolationType.BLACKCHAR;

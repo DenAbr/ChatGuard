@@ -2,6 +2,7 @@ package ru.Den_Abr.ChatGuard.ChatFilters;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
@@ -21,6 +22,12 @@ public class SwearFilter extends AbstractFilter {
 
 	@Override
 	public ViolationType checkMessage(String message, CGPlayer player) {
+		if (player.hasPermission("chatguard.ignore.swear"))
+			return null;
+		Matcher swearMatcher = swearPattern.matcher(message);
+		if (swearMatcher.find()) {
+			return ViolationType.SWEAR;
+		}
 		return null;
 	}
 
@@ -31,7 +38,7 @@ public class SwearFilter extends AbstractFilter {
 
 	@Override
 	public void register() {
-		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("Spam settings");
+		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("Swear settings");
 		if (!cs.getBoolean("enabled"))
 			return;
 		informAdmins = cs.getBoolean("inform admins");
@@ -54,6 +61,7 @@ public class SwearFilter extends AbstractFilter {
 			}
 			String line = Files.readFirstLine(newFileSwear, Charset.forName("UTF-8"));
 			swearPattern = Pattern.compile(line, Pattern.CASE_INSENSITIVE);
+			getActiveFilters().add(this);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
