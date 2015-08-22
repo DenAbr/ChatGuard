@@ -20,22 +20,49 @@ public class SpamFilter extends AbstractFilter {
 
 	@Override
 	public ViolationType checkMessage(String message, CGPlayer player) {
-
 		if (player.hasPermission("chatguard.ignore.adv"))
 			return null;
 
-		Matcher ipMatcher = ipPattern.matcher(message.replaceAll("[^A-Za-zА-Яа-яà-ÿÀ-ß]", ""));
-		Matcher domMatcher = domainPattern.matcher(message.replaceAll("[^A-Za-zА-Яа-яà-ÿÀ-ß]", ""));
+		Matcher ipMatcher = ipPattern.matcher(message);
+		Matcher domMatcher = domainPattern.matcher(message);
 
 		if (ipMatcher.find() || domMatcher.find()) {
 			return ViolationType.ADVERT;
 		}
-		return null;
+		if (maxNums < 1)
+			return null;
+		int charCount = 0;
+		for (char c : message.replaceAll(" ", "").toCharArray()) {
+			if (Character.isDigit(c)) {
+				charCount++;
+			}
+		}
+		return charCount > maxNums ? ViolationType.MANYNUMS : null;
 	}
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
-		return null;
+		message = message
+				.replaceAll(ipPattern.pattern(),
+						Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement())
+				.replaceAll(domainPattern.pattern(),
+						Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
+		if (maxNums > 0) {
+			StringBuffer sb = new StringBuffer();
+
+			int charCount = 0;
+			for (int i = 0; i < message.length(); i++) {
+				if (Character.isDigit(message.charAt(i))) {
+					charCount++;
+					if (charCount > maxNums) {
+						continue;
+					}
+				}
+				sb.append(message.charAt(i));
+			}
+			return sb.toString().trim();
+		}
+		return message;
 	}
 
 	@Override

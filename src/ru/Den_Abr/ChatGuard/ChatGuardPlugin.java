@@ -44,19 +44,21 @@ public class ChatGuardPlugin extends JavaPlugin {
 		getLogger().info("ChatGuard enabled!");
 	}
 
-	// you can do it from your's plugins
-	private void registerIntegratedPlugins() {
-		AbstractPlugin.getIntegratedPlugins().clear();
 
-		new AuthMeOld().register();
-	}
 
 	private void loadOnlinePlayers() {
 		for (Player p : getServer().getOnlinePlayers()) {
 			CGPlayer.get(p);
 		}
 	}
+	
+	// you can do it from your's plugins
+	private void registerIntegratedPlugins() {
+		AbstractPlugin.getIntegratedPlugins().clear();
 
+		new AuthMeOld().register();
+	}
+	
 	// the same as integration
 	public void registerFilters() {
 		AbstractFilter.getActiveFilters().clear();

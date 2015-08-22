@@ -39,7 +39,6 @@ public class CommandManager implements CommandExecutor {
 
 		String sub = arg3[0].toLowerCase();
 		String[] args = Arrays.copyOfRange(arg3, 1, arg3.length);
-		ChatGuardPlugin.debug(2, subComs.getNames(), sub);
 		if (!subComs.contains(sub)) {
 			arg0.sendMessage("Unknown command. Type '/" + arg2 + " help' for help");
 			return true;

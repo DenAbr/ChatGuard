@@ -1,7 +1,6 @@
 package ru.Den_Abr.ChatGuard.Commands;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.bukkit.ChatColor;

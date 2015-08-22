@@ -2,20 +2,23 @@
 # Dont worry if you have just updated plugin. Old configuration saved as old_config.yml #
 #        Please read comments and dont ask silly questions about configurating          #
 #   Dont use Notepad++ default tabulation. Enable 'Replace by space' in Tab Settings    #
-#       NOTICE: Enabling Hard Mode enables message cancelling automatically             #
 # ------------------------------------------------------------------------------------- #
 
 # dont touch this
 Version: 1
 
 Check for updates: true
+
+# NOTICE: Enabling Hard Mode enables message cancelling automatically 
+Hard mode: false
+
 # Max warnings and custom replacement work only if Separated warnings are enabled
 Swear settings:
     enabled: true
     inform admins: true
-    hard mode: true
     max warnings: 10
-    custom replacement: <bad word>
+    # supports color codes
+    custom replacement: '<bad word>'
 Caps settings:
     enabled: true
     inform admins: true
@@ -38,18 +41,17 @@ Spam settings:
     enabled: true
     inform admins: true
     max warnings: 10
-    # use only if you know something about regular expressions
-    domain regexp: '[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+~#?&//=]*)?'
+    # change only if you know something about regular expressions
+    domain regexp: '([0-9a-z]{2,}\\.)+(ru|com|org|ua|su|tv|net|biz|info|name|mobi|kz|by|lv|eu|tk)(:\\d*)?'
     ip regexp: '((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))'
-    custom replacement: <spam>
-    hard mode: true
+    custom replacement: '<spam>'
     # set how many numbers can players send in one message, 0 - disable
     max numbers: 3
 Messages:
     # message will be modified to normal if disabled
     cancel if violation: true
     # works only if separated warnings are enabled
-    replacement: <censored>
+    replacement: '<censored>'
     enable character whitelist: true
 Warnings settings:
     enabled: true

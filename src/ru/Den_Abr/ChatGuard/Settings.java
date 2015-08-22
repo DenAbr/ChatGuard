@@ -10,9 +10,14 @@ public class Settings {
 	private static boolean checkUpdates;
 	private static boolean usePackets;
 	private static boolean separateWarnings;
+	private static boolean hardmode;
+
 
 	private static int maxWarnings;
 	private static int debugLevel;
+
+	private static String replacement;
+
 
 	public static void load(ChatGuardPlugin pl) {
 		File fconfig = new File(pl.getDataFolder(), "config.yml");
@@ -23,6 +28,9 @@ public class Settings {
 		checkUpdates = config.getBoolean("Check for updates");
 		usePackets = config.getBoolean("Other settings.use packets");
 		separateWarnings = config.getBoolean("Warnings settings.separate");
+		hardmode = config.getBoolean("Hard mode");
+		
+		replacement = config.getString("Messages.replacement");
 
 		maxWarnings = config.getInt("Warnings settings.max warnings");
 		debugLevel = config.getInt("Other settings.debug level");
@@ -56,4 +64,11 @@ public class Settings {
 		return debugLevel;
 	}
 
+	public static String getReplacement() {
+		return replacement;
+	}
+
+	public static boolean isHardMode() {
+		return hardmode;
+	}
 }

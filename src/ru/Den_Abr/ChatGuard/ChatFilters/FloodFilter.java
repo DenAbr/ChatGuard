@@ -1,7 +1,6 @@
 package ru.Den_Abr.ChatGuard.ChatFilters;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -25,7 +24,7 @@ public class FloodFilter extends AbstractFilter {
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
-		return null;
+		return message;
 	}
 
 	@Override

@@ -21,6 +21,7 @@ public class SwearFilter extends AbstractFilter {
 	private List<Pattern> swearPatterns;
 	private String replacement;
 	private boolean informAdmins;
+	private boolean hardmode;
 
 	@Override
 	public ViolationType checkMessage(String message, CGPlayer player) {
@@ -37,7 +38,11 @@ public class SwearFilter extends AbstractFilter {
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
-		return null;
+		for (Pattern pattern : swearPatterns) {
+			message = message.replaceAll(pattern.pattern(),
+					Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
+		}
+		return message;
 	}
 
 	@Override
@@ -47,7 +52,7 @@ public class SwearFilter extends AbstractFilter {
 			return;
 		informAdmins = cs.getBoolean("inform admins");
 		maxWarns = cs.getInt("max warnings");
-
+		hardmode = cs.getBoolean("hard mode");
 		replacement = ChatColor.translateAlternateColorCodes('&', cs.getString("custom replacement"));
 
 		try {
