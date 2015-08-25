@@ -3,11 +3,13 @@ package ru.Den_Abr.ChatGuard.ChatFilters;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
-import ru.Den_Abr.ChatGuard.Settings;
 import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Configuration.Settings;
+import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
 public class SpamFilter extends AbstractFilter {
@@ -20,24 +22,34 @@ public class SpamFilter extends AbstractFilter {
 
 	@Override
 	public ViolationType checkMessage(String message, CGPlayer player) {
-		if (player.hasPermission("chatguard.ignore.adv"))
+		if (player.hasPermission("chatguard.ignore.spam"))
 			return null;
 
 		Matcher ipMatcher = ipPattern.matcher(message);
 		Matcher domMatcher = domainPattern.matcher(message);
-
+		ViolationType v = null;
 		if (ipMatcher.find() || domMatcher.find()) {
-			return ViolationType.ADVERT;
+			v = ViolationType.SPAM;
 		}
-		if (maxNums < 1)
-			return null;
-		int charCount = 0;
-		for (char c : message.replaceAll(" ", "").toCharArray()) {
-			if (Character.isDigit(c)) {
-				charCount++;
+		if (maxNums > 0) {
+			int charCount = 0;
+			for (char c : message.replaceAll(" ", "").toCharArray()) {
+				if (Character.isDigit(c)) {
+					charCount++;
+				}
 			}
+			if (charCount > maxNums)
+				v = ViolationType.SPAM;
 		}
-		return charCount > maxNums ? ViolationType.MANYNUMS : null;
+		if (v != null && informAdmins) {
+			informAdmins(player, message);
+		}
+		return v;
+	}
+
+	private void informAdmins(CGPlayer player, String message) {
+		Bukkit.broadcast(Message.INFORM_SPAM.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message),
+				"chatguard.inform.spam");
 	}
 
 	@Override

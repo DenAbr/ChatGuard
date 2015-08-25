@@ -3,8 +3,8 @@ package ru.Den_Abr.ChatGuard.ChatFilters;
 import java.util.HashSet;
 import java.util.Set;
 
-import ru.Den_Abr.ChatGuard.Settings;
 import ru.Den_Abr.ChatGuard.ViolationInfo;
+import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
 public abstract class AbstractFilter implements Filter {

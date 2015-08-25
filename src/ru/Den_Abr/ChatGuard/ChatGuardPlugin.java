@@ -13,8 +13,10 @@ import ru.Den_Abr.ChatGuard.ChatFilters.FloodFilter;
 import ru.Den_Abr.ChatGuard.ChatFilters.SpamFilter;
 import ru.Den_Abr.ChatGuard.ChatFilters.SwearFilter;
 import ru.Den_Abr.ChatGuard.Commands.CommandManager;
+import ru.Den_Abr.ChatGuard.Configuration.Messages;
+import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Integration.AbstractPlugin;
-import ru.Den_Abr.ChatGuard.Integration.AuthMeOld;
+import ru.Den_Abr.ChatGuard.Integration.AuthMeLegacy;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
@@ -34,6 +36,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 		if (Settings.canCheckUpdates()) {
 			checkForUpdates();
 		}
+		Messages.load(this);
 		startMetrics();
 		if (!setupProtocol()) {
 			getServer().getPluginManager().registerEvents(new PlayerListener(), this);
@@ -56,7 +59,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 	private void registerIntegratedPlugins() {
 		AbstractPlugin.getIntegratedPlugins().clear();
 
-		new AuthMeOld().register();
+		new AuthMeLegacy().register();
 	}
 	
 	// the same as integration
@@ -80,8 +83,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 	}
 
 	private void checkForUpdates() {
-		Updater up = new Updater(this, 50092, getFile(), UpdateType.NO_DOWNLOAD, true);
-
+		new Updater(this, 50092, getFile(), UpdateType.NO_DOWNLOAD, true);
 	}
 
 	public static ChatGuardPlugin getInstance() {

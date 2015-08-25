@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import com.google.common.base.Objects;
+
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 
 public abstract class CGPlayer {
@@ -37,7 +39,7 @@ public abstract class CGPlayer {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "{" + getName() + "}";
+		return Objects.toStringHelper(this).addValue(getName()).toString();
 	}
 
 	@Override

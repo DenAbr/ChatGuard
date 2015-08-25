@@ -7,8 +7,8 @@ import java.nio.charset.Charset;
 import com.google.common.io.Files;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
-import ru.Den_Abr.ChatGuard.Settings;
 import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
 public class CharacterFilter extends AbstractFilter {

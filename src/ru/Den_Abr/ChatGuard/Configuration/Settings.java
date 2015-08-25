@@ -1,8 +1,10 @@
-package ru.Den_Abr.ChatGuard;
+package ru.Den_Abr.ChatGuard.Configuration;
 
 import java.io.File;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 
 public class Settings {
 	private static YamlConfiguration config;
@@ -59,7 +61,7 @@ public class Settings {
 	public static int getMaxWarns() {
 		return maxWarnings;
 	}
-
+ 
 	public static int getDebugLevel() {
 		return debugLevel;
 	}

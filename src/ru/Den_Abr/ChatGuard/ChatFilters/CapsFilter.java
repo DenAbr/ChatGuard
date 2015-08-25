@@ -1,9 +1,11 @@
 package ru.Den_Abr.ChatGuard.ChatFilters;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
-import ru.Den_Abr.ChatGuard.Settings;
 import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Configuration.Settings;
+import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
 public class CapsFilter extends AbstractFilter {
@@ -22,7 +24,16 @@ public class CapsFilter extends AbstractFilter {
 			return null;
 		int capsCount = getCapsCount(ws);
 		int capspercent = capsCount * 100 / ws.length();
-		return (capspercent > maxCapsPercent) ? ViolationType.CAPS : null;
+		ViolationType v = (capspercent > maxCapsPercent) ? ViolationType.CAPS : null;
+		if (v != null && informAdmins) {
+			informAdmins(player, message);
+		}
+		return v;
+	}
+
+	private void informAdmins(CGPlayer player, String message) {
+		Bukkit.broadcast(Message.INFORM_CAPS.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message),
+				"chatguard.inform.caps");
 	}
 
 	private int getCapsCount(String message) {
