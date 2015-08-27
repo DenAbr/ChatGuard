@@ -15,7 +15,7 @@ import ru.Den_Abr.ChatGuard.ChatFilters.SwearFilter;
 import ru.Den_Abr.ChatGuard.Commands.CommandManager;
 import ru.Den_Abr.ChatGuard.Configuration.Messages;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
-import ru.Den_Abr.ChatGuard.Integration.AbstractPlugin;
+import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
 import ru.Den_Abr.ChatGuard.Integration.AuthMeLegacy;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
@@ -47,21 +47,19 @@ public class ChatGuardPlugin extends JavaPlugin {
 		getLogger().info("ChatGuard enabled!");
 	}
 
-
-
 	private void loadOnlinePlayers() {
 		for (Player p : getServer().getOnlinePlayers()) {
 			CGPlayer.get(p);
 		}
 	}
-	
-	// you can do it from your's plugins
-	private void registerIntegratedPlugins() {
-		AbstractPlugin.getIntegratedPlugins().clear();
 
+	private void registerIntegratedPlugins() {
+		AbstractIntegration.getIntegratedPlugins().clear();
+
+		// you can do it from your's plugins
 		new AuthMeLegacy().register();
 	}
-	
+
 	// the same as integration
 	public void registerFilters() {
 		AbstractFilter.getActiveFilters().clear();

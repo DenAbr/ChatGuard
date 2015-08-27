@@ -1,11 +1,14 @@
 package ru.Den_Abr.ChatGuard.Commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
+import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
+import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class SubCommandHandler {
@@ -38,31 +41,43 @@ public class SubCommandHandler {
 				// Console or command block doesnt have chat
 				cs.sendMessage("No.");
 			}
+			return;
+		}
+		if (cs.hasPermission("chatguard.clearchat.all") && args[0].equalsIgnoreCase("ALL")) {
+			for (Player p : Utils.getOnlinePlayers()) {
+				Utils.clearChat(p);
+			}
+			return;
+		}
+		if (cs.hasPermission("chatguard.clearchar.others")) {
+			Player p = Bukkit.getPlayer(args[0]);
+			if (p == null || !p.isOnline()) {
+				cs.sendMessage(Message.PLAYER_NOT_FOUND.get());
+				return;
+			} else {
+				Utils.clearChat(p);
+			}
+		} else {
+			cs.sendMessage(Message.NO_PERMS.get());
 		}
 	}
 
 	@Cmd(desc = "Show your warnings or (Player)'s", name = "globalmute", perm = "chatguard.globalmute", args = "", max = 0)
 	public void globalmute(CommandSender cs, String[] args) {
+		// ya
+		PlayerListener.globalMute = !PlayerListener.globalMute;
 
+		Bukkit.broadcastMessage(
+				PlayerListener.globalMute ? Message.GLOBAL_MUTE_ENABLED.get() : Message.GLOBAL_MUTE_DISABLED.get());
 	}
 
-	@Cmd(desc = "Clear all warnings", name = "clear", perm = "chatguard.clear", args = "", max = 0)
+	@Cmd(desc = "Clear some warnings", name = "clear", perm = "chatguard.clear", args = "(Type) (Player)", max = 2)
 	public void clear(CommandSender cs, String[] args) {
-
+		
 	}
 
-	@Cmd(desc = "Give a warning for [Player]", name = "warn", perm = "chatguard.addwarn", args = "[Player] (Type)", min = 1, max = 2)
+	@Cmd(desc = "Warn [Player]", name = "warn", perm = "chatguard.addwarn", args = "[Player] (Type)", min = 1, max = 2)
 	public void warn(CommandSender cs, String[] args) {
-
-	}
-
-	@Cmd(desc = "Mute [Players] for some [Reason]", name = "mute", perm = "chatguard.mute", args = "[Player] [Time] [Reason]", min = 2, max = 30)
-	public void mute(CommandSender cs, String[] args) {
-
-	}
-
-	@Cmd(desc = "Allow [Player] to send messages", name = "unmute", perm = "chatguard.unmute", args = "[Player]", min = 1)
-	public void unmute(CommandSender cs, String[] args) {
 
 	}
 

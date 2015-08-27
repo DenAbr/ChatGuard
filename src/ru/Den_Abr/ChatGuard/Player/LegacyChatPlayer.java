@@ -2,6 +2,8 @@ package ru.Den_Abr.ChatGuard.Player;
 
 import org.bukkit.entity.Player;
 
+/** This implementation is needed for intagrating UUID system in the future **/
+
 public class LegacyChatPlayer extends CGPlayer {
 	private Player p;
 
@@ -18,6 +20,5 @@ public class LegacyChatPlayer extends CGPlayer {
 	public String getName() {
 		return p.getName();
 	}
-	
-	
+
 }

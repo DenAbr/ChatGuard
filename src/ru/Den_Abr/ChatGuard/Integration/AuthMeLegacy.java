@@ -7,7 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import uk.org.whoami.authme.cache.auth.PlayerCache;
 
-public class AuthMeLegacy extends AbstractPlugin {
+public class AuthMeLegacy extends AbstractIntegration {
 	private JavaPlugin plugin;
 
 	@Override

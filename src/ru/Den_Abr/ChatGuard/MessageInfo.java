@@ -5,7 +5,7 @@ import java.util.List;
 
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
-public class ViolationInfo {
+public class MessageInfo {
 
 	private String originalMessage;
 	private String clearMessage;

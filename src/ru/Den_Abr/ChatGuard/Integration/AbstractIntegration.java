@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 
-public abstract class AbstractPlugin implements IntegratedPlugin {
+public abstract class AbstractIntegration implements IntegratedPlugin {
 	private static Set<IntegratedPlugin> plugins = new HashSet<>();
 
 	public static Set<IntegratedPlugin> getIntegratedPlugins() {
