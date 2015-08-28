@@ -13,20 +13,20 @@ Check for updates: true
 Hard mode: false
 
 # Max warnings and custom replacement work only if Separated warnings are enabled
-Swear settings:
+swear settings:
     enabled: true
     inform admins: true
     max warnings: 10
     # supports color codes
     custom replacement: '<bad word>'
-Caps settings:
+caps settings:
     enabled: true
     inform admins: true
     max warnings: 10
     max caps percent: 60
     # dont check if message smaller than your value(ex. for escaping smiles)
     min message lenght: 3
-Flood settings:
+flood settings:
     # flood messages will be cancelled in any way
     enabled: true
     inform admins: true
@@ -37,7 +37,7 @@ Flood settings:
     message cooldown: 5
     # 1 value means that the last player's message will be checked for flood only(2 - with penultimate, etc.)
     flood levels: 1
-Spam settings:
+spam settings:
     enabled: true
     inform admins: true
     max warnings: 10
@@ -60,7 +60,7 @@ Warnings settings:
     max count: 10
 Punishment settings:
     enabled: true
-    # you can add any reason with any name how many as you want
+    # you can add any reason with any name how many as you want(but for what?)
     reasons: 
         1: '{Player} kicked because he is bad boy'
         second: '{Player} banned for capsing'

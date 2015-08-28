@@ -3,7 +3,7 @@ package ru.Den_Abr.ChatGuard.ChatFilters;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
-import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
@@ -14,7 +14,7 @@ public class CapsFilter extends AbstractFilter {
 	private int minLenght;
 
 	@Override
-	public ViolationType checkMessage(String message, CGPlayer player) {
+	public Violation checkMessage(String message, CGPlayer player) {
 		if (message.length() < minLenght)
 			return null;
 		if (player.hasPermission("chatguard.ignore.caps"))
@@ -24,7 +24,7 @@ public class CapsFilter extends AbstractFilter {
 			return null;
 		int capsCount = getCapsCount(ws);
 		int capspercent = capsCount * 100 / ws.length();
-		ViolationType v = (capspercent > maxCapsPercent) ? ViolationType.CAPS : null;
+		Violation v = (capspercent > maxCapsPercent) ? Violation.CAPS : null;
 		if (v != null && informAdmins) {
 			informAdmins(player, message);
 		}
@@ -53,7 +53,7 @@ public class CapsFilter extends AbstractFilter {
 
 	@Override
 	public void register() {
-		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("Caps settings");
+		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("caps settings");
 		if (!cs.getBoolean("enabled"))
 			return;
 		informAdmins = cs.getBoolean("inform admins");

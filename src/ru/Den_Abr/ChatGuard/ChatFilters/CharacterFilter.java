@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import com.google.common.io.Files;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
-import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
@@ -15,12 +15,12 @@ public class CharacterFilter extends AbstractFilter {
 	private String charSet;
 
 	@Override
-	public ViolationType checkMessage(String message, CGPlayer player) {
+	public Violation checkMessage(String message, CGPlayer player) {
 		if (player.hasPermission("chatguard.ignore.characters"))
 			return null;
 		for (char c : message.toCharArray()) {
 			if (isNotAllowed(c)) {
-				return ViolationType.BLACKCHAR;
+				return Violation.BLACKCHAR;
 			}
 		}
 		return null;

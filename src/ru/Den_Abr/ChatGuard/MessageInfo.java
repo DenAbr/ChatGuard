@@ -10,7 +10,7 @@ public class MessageInfo {
 	private String originalMessage;
 	private String clearMessage;
 	private CGPlayer player;
-	private List<ViolationType> violations = new ArrayList<>();
+	private List<Violation> violations = new ArrayList<>();
 
 	public String getOriginalMessage() {
 		return originalMessage;
@@ -36,7 +36,7 @@ public class MessageInfo {
 		this.player = player;
 	}
 
-	public List<ViolationType> getViolations() {
+	public List<Violation> getViolations() {
 		return violations;
 	}
 }

@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ru.Den_Abr.ChatGuard.MessageInfo;
-import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
@@ -22,15 +22,15 @@ public abstract class AbstractFilter implements Filter {
 		info.setOriginalMessage(mes);
 		info.setClearMessage(mes);
 		for (Filter f : getActiveFilters()) {
-			ViolationType v = f.checkMessage(mes, player);
+			Violation v = f.checkMessage(mes, player);
 			info.setClearMessage(f.getClearMessage(mes, player));
-			if (v != null && v != ViolationType.BLACKCHAR) {
+			if (v != null && v != Violation.BLACKCHAR) {
 				info.getViolations().add(v);
 			}
 		}
 		return info;
 	}
-
+	
 	@Override
 	public int getMaxWarnings() {
 		return Settings.isSeparatedWarnings() ? maxWarns : Settings.getMaxWarns();

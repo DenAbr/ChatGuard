@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
-import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
@@ -16,8 +16,8 @@ public class FloodFilter extends AbstractFilter {
 	private int levels;
 
 	@Override
-	public ViolationType checkMessage(String message, CGPlayer player) {
-		ViolationType v = null;
+	public Violation checkMessage(String message, CGPlayer player) {
+		Violation v = null;
 		if (player.hasPermission("chatguard.ignore.flood"))
 			return v;
 
@@ -33,7 +33,7 @@ public class FloodFilter extends AbstractFilter {
 		for (String lm : player.getLastMessages()) {
 			lm = lm.replaceAll("\\s+", " ").toLowerCase();
 			if (lm.equalsIgnoreCase(wws) || (lm.startsWith(wws) && wws.length() - lm.length() < 4)) {
-				v = ViolationType.FLOOD;
+				v = Violation.FLOOD;
 			}
 		}
 		if (v != null && informAdmins) {
@@ -54,7 +54,7 @@ public class FloodFilter extends AbstractFilter {
 
 	@Override
 	public void register() {
-		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("Flood settings");
+		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("flood settings");
 		if (!cs.getBoolean("enabled"))
 			return;
 		informAdmins = cs.getBoolean("inform admins");

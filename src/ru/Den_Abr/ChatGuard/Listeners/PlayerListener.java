@@ -50,14 +50,13 @@ public class PlayerListener implements Listener {
 				player.setLastMessageTime(System.currentTimeMillis());
 				player.getLastMessages().add(e.getMessage());
 			}
-			// TODO Warn and punish
 			return;
 		}
 		player.setLastMessageTime(System.currentTimeMillis());
 		player.getLastMessages().add(e.getMessage());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerCommand(PlayerCommandPreprocessEvent e) {
 		if (AbstractIntegration.shouldSkip(e.getPlayer()))
 			return;
@@ -82,14 +81,13 @@ public class PlayerListener implements Listener {
 				player.setLastMessageTime(System.currentTimeMillis());
 				player.getLastMessages().add(e.getMessage());
 			}
-			// TODO Warn and punish
 			return;
 		}
 		player.setLastMessageTime(System.currentTimeMillis());
 		player.getLastMessages().add(e.getMessage());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onSignChange(SignChangeEvent e) {
 		if (AbstractIntegration.shouldSkip(e.getPlayer()))
 			return;

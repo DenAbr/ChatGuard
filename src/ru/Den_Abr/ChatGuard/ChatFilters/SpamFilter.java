@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
-import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
@@ -21,15 +21,15 @@ public class SpamFilter extends AbstractFilter {
 	private int maxNums;
 
 	@Override
-	public ViolationType checkMessage(String message, CGPlayer player) {
+	public Violation checkMessage(String message, CGPlayer player) {
 		if (player.hasPermission("chatguard.ignore.spam"))
 			return null;
 
 		Matcher ipMatcher = ipPattern.matcher(message);
 		Matcher domMatcher = domainPattern.matcher(message);
-		ViolationType v = null;
+		Violation v = null;
 		if (ipMatcher.find() || domMatcher.find()) {
-			v = ViolationType.SPAM;
+			v = Violation.SPAM;
 		}
 		if (maxNums > 0) {
 			int charCount = 0;
@@ -39,7 +39,7 @@ public class SpamFilter extends AbstractFilter {
 				}
 			}
 			if (charCount > maxNums)
-				v = ViolationType.SPAM;
+				v = Violation.SPAM;
 		}
 		if (v != null && informAdmins) {
 			informAdmins(player, message);
@@ -79,7 +79,7 @@ public class SpamFilter extends AbstractFilter {
 
 	@Override
 	public void register() {
-		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("Spam settings");
+		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("spam settings");
 		if (!cs.getBoolean("enabled"))
 			return;
 		informAdmins = cs.getBoolean("inform admins");

@@ -14,7 +14,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import com.google.common.io.Files;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
-import ru.Den_Abr.ChatGuard.ViolationType;
+import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
@@ -25,14 +25,14 @@ public class SwearFilter extends AbstractFilter {
 	private boolean informAdmins;
 
 	@Override
-	public ViolationType checkMessage(String message, CGPlayer player) {
+	public Violation checkMessage(String message, CGPlayer player) {
 		if (player.hasPermission("chatguard.ignore.swear"))
 			return null;
-		ViolationType v = null;
+		Violation v = null;
 		for (Pattern word : swearPatterns) {
 			Matcher swearMatcher = word.matcher(message);
 			if (swearMatcher.find()) {
-				v = ViolationType.SWEAR;
+				v = Violation.SWEAR;
 				break;
 			}
 		}
@@ -58,7 +58,7 @@ public class SwearFilter extends AbstractFilter {
 
 	@Override
 	public void register() {
-		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("Swear settings");
+		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("swear settings");
 		if (!cs.getBoolean("enabled"))
 			return;
 		informAdmins = cs.getBoolean("inform admins");
