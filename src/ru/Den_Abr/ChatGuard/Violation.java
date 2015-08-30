@@ -2,7 +2,8 @@ package ru.Den_Abr.ChatGuard;
 
 public enum Violation {
 
-	SWEAR("swear"), SPAM("spam"), FLOOD("flood"), CAPS("caps"), BLACKCHAR("none");
+	SWEAR("swear"), SPAM("spam"), FLOOD("flood"), CAPS("caps"), BLACKCHAR(
+			"none");
 
 	private String pt;
 
@@ -12,5 +13,13 @@ public enum Violation {
 
 	public String getPunishmentSection() {
 		return pt;
+	}
+
+	public static Violation get(String t) {
+		for (Violation v : values()) {
+			if (v.name().equals(t))
+				return v;
+		}
+		return null;
 	}
 }

@@ -8,14 +8,15 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import com.google.common.base.Objects;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Utils.FixedSizeList;
+
+import com.google.common.base.Objects;
 
 public abstract class CGPlayer {
 	private static List<CGPlayer> cache = new LinkedList<>();
@@ -68,6 +69,8 @@ public abstract class CGPlayer {
 	}
 
 	public static CGPlayer get(Player p) {
+		if (null == p)
+			return null;
 		CGPlayer temp = new LegacyChatPlayer(p);
 		if (cache.contains(new LegacyChatPlayer(p))) {
 			return cache.get(cache.indexOf(temp));
@@ -91,10 +94,15 @@ public abstract class CGPlayer {
 	}
 
 	public void handleViolation(Violation v, int maxWarn) {
+		if (maxWarn == -1) {
+			maxWarn = Settings.getConfig().getInt(
+					v.getPunishmentSection() + " settings.max warnings");
+		}
 		violations.add(v);
 		int violCount = getViolationCount(v, false);
 		warn(v, violCount, maxWarn);
-		if (violCount >= maxWarn && Settings.isPunishmentsEnabled() && Settings.isWarnsEnabled()) {
+		if (violCount >= maxWarn && Settings.isPunishmentsEnabled()
+				&& Settings.isWarnsEnabled()) {
 			punish(v);
 			clearWarnings(v, Settings.isSeparatedWarnings());
 		}
@@ -113,33 +121,50 @@ public abstract class CGPlayer {
 	}
 
 	public void punish(Violation v) {
-		for (String command : Settings.getPunishCommands(v.getPunishmentSection())) {
-			for (Entry<String, String> reasonEntry : Settings.getPunishReasons().entrySet()) {
-				command = command.replace("{Reason_" + reasonEntry.getKey() + "}", reasonEntry.getValue());
+		for (String command : Settings.getPunishCommands(v
+				.getPunishmentSection())) {
+			for (Entry<String, String> reasonEntry : Settings
+					.getPunishReasons().entrySet()) {
+				command = command.replace("{Reason_" + reasonEntry.getKey()
+						+ "}", reasonEntry.getValue());
 			}
 			command = command.replace("{Player}", getName());
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+			final StringBuilder sb = new StringBuilder(command);
+			new BukkitRunnable() {
+				// chat events is async and we need to sync command execution
+				@Override
+				public void run() {
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+							sb.toString());
+				}
+			}.runTask(ChatGuardPlugin.getInstance());
+
 		}
 	}
 
 	public void warn(Violation v, Integer violCount, Integer max) {
-		String warnFormat = Message.WARN_FORMAT.get().replace("{MAX}", max.toString()).replace("{CURRENT}",
-				violCount.toString());
+		String warnFormat = Message.WARN_FORMAT.get()
+				.replace("{MAX}", max.toString())
+				.replace("{CURRENT}", violCount.toString());
 		if (!Settings.isWarnsEnabled())
 			warnFormat = "";
 		// *_*
 		switch (v) {
 		case SWEAR:
-			getPlayer().sendMessage(Message.SWEARING.get().replace("{WARNS}", warnFormat));
+			getPlayer().sendMessage(
+					Message.SWEARING.get().replace("{WARNS}", warnFormat));
 			break;
 		case CAPS:
-			getPlayer().sendMessage(Message.CAPSING.get().replace("{WARNS}", warnFormat));
+			getPlayer().sendMessage(
+					Message.CAPSING.get().replace("{WARNS}", warnFormat));
 			break;
 		case SPAM:
-			getPlayer().sendMessage(Message.SPAMMING.get().replace("{WARNS}", warnFormat));
+			getPlayer().sendMessage(
+					Message.SPAMMING.get().replace("{WARNS}", warnFormat));
 			break;
 		case FLOOD:
-			getPlayer().sendMessage(Message.FLOODING.get().replace("{WARNS}", warnFormat));
+			getPlayer().sendMessage(
+					Message.FLOODING.get().replace("{WARNS}", warnFormat));
 			break;
 		default:
 			break;

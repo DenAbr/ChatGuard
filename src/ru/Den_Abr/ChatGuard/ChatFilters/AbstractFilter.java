@@ -27,6 +27,7 @@ public abstract class AbstractFilter implements Filter {
 				info.setClearMessage(f.getClearMessage(mes, player));
 				if (v != Violation.BLACKCHAR) {
 					player.handleViolation(v, f.getMaxWarnings());
+					info.getViolations().add(v);
 				}
 			}
 		}

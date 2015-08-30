@@ -42,7 +42,8 @@ public class Settings {
 
 		if (!config.isSet("Version")) {
 			try {
-				Files.move(fconfig, new File(pl.getDataFolder(), "old_config.yml"));
+				Files.move(fconfig, new File(pl.getDataFolder(),
+						"old_config.yml"));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -54,7 +55,8 @@ public class Settings {
 		usePackets = config.getBoolean("Other settings.use packets");
 		separateWarnings = config.getBoolean("Warnings settings.separate");
 		hardmode = config.getBoolean("Hard mode");
-		cancelEnabled = config.getBoolean("Messages.enable character whitelist");
+		cancelEnabled = config
+				.getBoolean("Messages.cancel if violation");
 		warnsEnabled = config.getBoolean("Warnings settings.enabled");
 		punishmentsEnabled = config.getBoolean("Punishment settings.enabled");
 
@@ -62,10 +64,11 @@ public class Settings {
 
 		maxWarnings = config.getInt("Warnings settings.max warnings");
 		debugLevel = config.getInt("Other settings.debug level");
-		cooldown = config.getInt("Flood settings.message cooldown");
+		cooldown = config.getInt("flood settings.message cooldown");
 
 		commands.clear();
-		for (String command : config.getStringList("Other settings.check commands")) {
+		for (String command : config
+				.getStringList("Other settings.check commands")) {
 			if (!command.contains(":")) {
 				continue;
 			}
@@ -75,13 +78,18 @@ public class Settings {
 			commands.put(cmd[0].toLowerCase(), Integer.parseInt(cmd[1]));
 		}
 		reasons.clear();
-		for (String key : config.getConfigurationSection("Punishment settings.reasons").getKeys(false)) {
-			reasons.put(key, ChatColor.translateAlternateColorCodes('&',
-					config.getString("Punishment settings.reasons." + key)));
+		for (String key : config.getConfigurationSection(
+				"Punishment settings.reasons").getKeys(false)) {
+			reasons.put(
+					key,
+					ChatColor.translateAlternateColorCodes(
+							'&',
+							config.getString("Punishment settings.reasons."
+									+ key)));
 		}
 
 		if (debugLevel != 0) {
-			ChatGuardPlugin.getInstance().getLogger().info("Debugging level: " + getDebugLevel());
+			ChatGuardPlugin.debug(1, "Debugging level: " + getDebugLevel());
 		}
 	}
 
@@ -144,7 +152,8 @@ public class Settings {
 	public static List<String> getPunishCommands(String sec) {
 		if (!config.getBoolean("Punishment settings.commands.custom"))
 			sec = "common";
-		return config.getStringList("Punishment settings.commands." + sec + " commands");
+		return config.getStringList("Punishment settings.commands." + sec
+				+ " commands");
 	}
 
 	public static Map<String, String> getPunishReasons() {

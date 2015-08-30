@@ -48,7 +48,9 @@ public class SpamFilter extends AbstractFilter {
 	}
 
 	private void informAdmins(CGPlayer player, String message) {
-		Bukkit.broadcast(Message.INFORM_SPAM.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message),
+		String complete = Message.INFORM_SPAM.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message);
+		Bukkit.getConsoleSender().sendMessage(complete);
+		Bukkit.broadcast(complete,
 				"chatguard.inform.spam");
 	}
 

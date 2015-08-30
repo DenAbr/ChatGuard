@@ -10,6 +10,7 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
+import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.MessageInfo;
 import ru.Den_Abr.ChatGuard.ChatFilters.AbstractFilter;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
@@ -33,9 +34,12 @@ public class PlayerListener implements Listener {
 
 		if (!player.hasPermission("chatguard.ignore.cooldown")) {
 			int cdtime = isCooldownOver(player);
+			ChatGuardPlugin.debug(1, player.getName() + " CD " + cdtime);
 			if (cdtime > 0) {
 				e.setCancelled(true);
-				e.getPlayer().sendMessage(Message.WAIT_COOLDOWN.get().replace("{TIME}", cdtime + Message.SEC.get()));
+				e.getPlayer().sendMessage(
+						Message.WAIT_COOLDOWN.get().replace("{TIME}",
+								cdtime + Message.SEC.get()));
 				return;
 			}
 		}
@@ -43,7 +47,7 @@ public class PlayerListener implements Listener {
 		MessageInfo info = AbstractFilter.handleMessage(e.getMessage(), player);
 		e.setMessage(info.getClearMessage());
 
-		if (!info.getViolations().isEmpty()) { // nothing happened
+		if (!info.getViolations().isEmpty()) {
 			if (Settings.isCancellingEnabled()) {
 				e.setCancelled(true);
 			} else {
@@ -89,19 +93,22 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onSignChange(SignChangeEvent e) {
-		if (AbstractIntegration.shouldSkip(e.getPlayer()))
+		if (AbstractIntegration.shouldSkip(e.getPlayer())) // lol?
 			return;
 
 	}
 
 	private int isCooldownOver(CGPlayer pl) {
-		if (!Settings.isCooldownEnabled())
+		if (!Settings.isCooldownEnabled()) {
 			return 0;
+		}
 		if (pl.getLastMessageTime() != -1) {
-			long overtime = pl.getLastMessageTime() + TimeUnit.SECONDS.toMillis(Settings.getCooldown());
-			int offset = (int) TimeUnit.MILLISECONDS.toSeconds(overtime - System.currentTimeMillis());
+			long overtime = pl.getLastMessageTime()
+					+ TimeUnit.SECONDS.toMillis(Settings.getCooldown());
+			double offset = Math.ceil((double) (overtime - System
+					.currentTimeMillis()) / 1000);
 			if (offset > 0) {
-				return offset;
+				return (int) offset;
 			}
 		}
 		return 0;

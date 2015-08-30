@@ -15,7 +15,7 @@ public class Messages {
 						"no permissions"), GLOBAL_MUTE_ENABLED("global mute enabled"), GLOBAL_MUTE_DISABLED(
 								"global mute disabled"), INFORM_FLOOD("inform flood"), SWEARING(
 										"warn swearing"), FLOODING("warn flooding"), SPAMMING("warn spamming"), CAPSING(
-												"warn capsing"), WARN_FORMAT("warn format");
+												"warn capsing"), WARN_FORMAT("warn format"), SUCCESSFULLY("successfully"), SWEAR("swear"), SPAM("spam"), FLOOD("flood"), CAPS("caps");
 
 		private String key;
 

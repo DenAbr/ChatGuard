@@ -32,7 +32,9 @@ public class CapsFilter extends AbstractFilter {
 	}
 
 	private void informAdmins(CGPlayer player, String message) {
-		Bukkit.broadcast(Message.INFORM_CAPS.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message),
+		String complete = Message.INFORM_CAPS.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message);
+		Bukkit.getConsoleSender().sendMessage(complete);
+		Bukkit.broadcast(complete,
 				"chatguard.inform.caps");
 	}
 
