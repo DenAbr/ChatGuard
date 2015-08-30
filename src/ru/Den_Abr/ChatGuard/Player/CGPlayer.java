@@ -95,8 +95,7 @@ public abstract class CGPlayer {
 
 	public void handleViolation(Violation v, int maxWarn) {
 		if (maxWarn == -1) {
-			maxWarn = Settings.getConfig().getInt(
-					v.getPunishmentSection() + " settings.max warnings");
+			maxWarn = Settings.getMaxWarnCount(v.getPunishmentSection());
 		}
 		violations.add(v);
 		int violCount = getViolationCount(v, false);
