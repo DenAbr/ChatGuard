@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import com.google.common.io.Files;
-
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
+
+import com.google.common.io.Files;
 
 public class CharacterFilter extends AbstractFilter {
 	private String charSet;

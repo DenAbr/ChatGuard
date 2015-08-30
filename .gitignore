@@ -1,4 +1,6 @@
 /bin/
 /.settings/
-.project
+/.project
 /build.xml
+
+/.classpath

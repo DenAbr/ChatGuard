@@ -4,8 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 import ru.Den_Abr.ChatGuard.Violation;
-import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
+import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
 public class CapsFilter extends AbstractFilter {
