@@ -25,14 +25,15 @@ public abstract class AbstractFilter implements Filter {
 			Violation v = f.checkMessage(mes, player);
 			info.setClearMessage(f.getClearMessage(mes, player));
 			if (v != null && v != Violation.BLACKCHAR) {
-				info.getViolations().add(v);
+				player.handleViolation(v, f.getMaxWarnings());
 			}
 		}
 		return info;
 	}
-	
+
 	@Override
 	public int getMaxWarnings() {
-		return Settings.isSeparatedWarnings() ? maxWarns : Settings.getMaxWarns();
+		return Settings.isSeparatedWarnings() ? maxWarns : Settings
+				.getMaxWarns();
 	}
 }
