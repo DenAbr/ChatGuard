@@ -92,9 +92,9 @@ public class SwearFilter extends AbstractFilter {
 							Charset.forName("UTF-8")).replace('|', '\n');
 					Files.write(oldLine.getBytes(Charset.forName("UTF-8")),
 							newFileSwear);
-					oldFileSwear
-							.renameTo(new File(ChatGuardPlugin.getInstance()
-									.getDataFolder(), "swearlistOLD.txt"));
+					oldFileSwear.renameTo(new File(ChatGuardPlugin
+							.getInstance().getDataFolder(), "old"
+							+ File.separator + "swearlist.txt"));
 					ChatGuardPlugin.getLog().info("Moved old swearlist file");
 				} else {
 					ChatGuardPlugin.getInstance().saveResource(

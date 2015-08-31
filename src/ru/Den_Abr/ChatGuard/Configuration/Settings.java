@@ -36,7 +36,6 @@ public class Settings {
 	private static Map<String, Integer> commands = new HashMap<>();
 	private static Map<String, String> reasons = new HashMap<>();
 
-
 	public static void load(ChatGuardPlugin pl) {
 		File fconfig = new File(pl.getDataFolder(), "config.yml");
 		if (!fconfig.exists())
@@ -45,8 +44,17 @@ public class Settings {
 
 		if (!config.isSet("Version")) {
 			try {
-				Files.move(fconfig, new File(pl.getDataFolder(),
-						"old_config.yml"));
+				new File(pl.getDataFolder(), "old").mkdirs();
+				Files.move(fconfig, new File(
+						new File(pl.getDataFolder(), "old"), "old_config.yml"));
+				Files.move(new File(pl.getDataFolder(), "warnings.yml"),
+						new File(new File(pl.getDataFolder(), "old"),
+								"warnings.yml"));
+				Files.move(new File(pl.getDataFolder(), "messages.yml"),
+						new File(new File(pl.getDataFolder(), "old"),
+								"messages.yml"));
+				ChatGuardPlugin.getLog().info(
+						"Old configuration was moved to old dirrectory");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
