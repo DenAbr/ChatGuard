@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,12 +16,13 @@ import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
+import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
 import com.google.common.io.Files;
 
 public class SwearFilter extends AbstractFilter {
-	private static List<Pattern> swearPatterns = new ArrayList<>();
+	private static Pattern swearPattern;
 	private String replacement;
 	private boolean informAdmins;
 
@@ -31,13 +31,13 @@ public class SwearFilter extends AbstractFilter {
 		if (player.hasPermission("chatguard.ignore.swear"))
 			return null;
 		Violation v = null;
-		for (Pattern word : swearPatterns) {
-			Matcher swearMatcher = word.matcher(message);
-			if (swearMatcher.find()) {
-				v = Violation.SWEAR;
-				break;
-			}
+		Matcher swearMatcher = swearPattern.matcher(message);
+		while (swearMatcher.find()) {
+			if (Whitelist.isWhitelisted(swearMatcher.group()))
+				continue;
+			v = Violation.SWEAR;
 		}
+
 		if (v != null && informAdmins) {
 			informAdmins(player, message);
 		}
@@ -54,9 +54,14 @@ public class SwearFilter extends AbstractFilter {
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
-		for (Pattern pattern : swearPatterns) {
+		Matcher swearMatcher = swearPattern.matcher(message);
+		while (swearMatcher.find()) {
+			String group = swearMatcher.group();
+			if (Whitelist.isWhitelisted(group)) {
+				continue;
+			}
 			message = message.replaceAll(
-					pattern.pattern(),
+					group,
 					Settings.isSeparatedWarnings() ? replacement : Settings
 							.getReplacement());
 		}
@@ -96,15 +101,18 @@ public class SwearFilter extends AbstractFilter {
 							.warning("Check your swearwords.txt file!");
 				}
 			}
-			swearPatterns.clear();
-
+			String pat = "";
 			for (String word : new ArrayList<>(Files.readLines(newFileSwear,
 					Charset.forName("UTF-8")))) {
 				if (word.isEmpty())
 					continue;
-				swearPatterns.add(Pattern.compile(word,
-						Pattern.CASE_INSENSITIVE));
+				if (pat.isEmpty()) {
+					pat = word;
+				} else {
+					pat += "|" + word;
+				}
 			}
+			swearPattern = Pattern.compile(pat, Pattern.CASE_INSENSITIVE);
 			getActiveFilters().add(this);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -114,7 +122,8 @@ public class SwearFilter extends AbstractFilter {
 
 	public static void addWord(String w) {
 		Pattern p = Pattern.compile(w);
-		swearPatterns.add(p);
+		swearPattern = Pattern.compile(swearPattern.pattern() + "|"
+				+ p.pattern());
 		File swearFile = new File(
 				ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
 		try {

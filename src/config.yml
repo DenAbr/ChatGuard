@@ -42,7 +42,7 @@ spam settings:
     inform admins: true
     max warnings: 10
     # change only if you know something about regular expressions
-    domain regexp: '([0-9a-z]{2,}\\.)+(ru|com|org|ua|su|tv|net|biz|info|name|mobi|kz|by|lv|eu|tk)(:\\d*)?'
+    domain regexp: '([0-9a-z]{2,}\.)+(ru|com|org|ua|su|tv|net|biz|info|name|mobi|kz|by|lv|eu|tk)(:\d*)?'
     ip regexp: '((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))'
     custom replacement: '<spam>'
     # set how many numbers can players send in one message, 0 - disable

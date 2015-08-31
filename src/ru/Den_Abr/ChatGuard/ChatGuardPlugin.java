@@ -15,6 +15,7 @@ import ru.Den_Abr.ChatGuard.ChatFilters.SwearFilter;
 import ru.Den_Abr.ChatGuard.Commands.CommandManager;
 import ru.Den_Abr.ChatGuard.Configuration.Messages;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
+import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
 import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
 import ru.Den_Abr.ChatGuard.Integration.AuthMeLegacy;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
@@ -31,15 +32,19 @@ public class ChatGuardPlugin extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 
-		Settings.load(this);
 		getCommand("cg").setExecutor(new CommandManager(this));
+
+		Settings.load(this);
 		if (Settings.canCheckUpdates()) {
 			checkForUpdates();
 		}
 		Messages.load(this);
+		Whitelist.load(this);
+
 		startMetrics();
 		if (!setupProtocol()) {
-			getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+			getServer().getPluginManager().registerEvents(new PlayerListener(),
+					this);
 		}
 		registerIntegratedPlugins();
 		registerFilters();
@@ -98,7 +103,8 @@ public class ChatGuardPlugin extends JavaPlugin {
 			PacketsListener.startListening();
 			return true;
 		} else
-			getLogger().info("Install ProtocolLib to enable 'use packets' setting");
+			getLogger().info(
+					"Install ProtocolLib to enable 'use packets' setting");
 		return false;
 	}
 
