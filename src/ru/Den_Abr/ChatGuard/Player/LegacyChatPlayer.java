@@ -20,10 +20,15 @@ public class LegacyChatPlayer extends CGPlayer {
 	public String getName() {
 		return p.getName();
 	}
-	
-	@Override
+
+	@Override 
 	public Player getPlayer() {
 		return p;
+	}
+
+	@Override
+	public void updatePlayer(Player p) {
+		this.p = p;
 	}
 
 }

@@ -5,14 +5,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.google.common.io.Files;
-
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
+
+import com.google.common.io.Files;
 
 public class Settings {
 	private static YamlConfiguration config;
@@ -24,6 +25,7 @@ public class Settings {
 	private static boolean cancelEnabled;
 	private static boolean warnsEnabled;
 	private static boolean punishmentsEnabled;
+	private static boolean signsEnabled;
 
 	private static int maxWarnings;
 	private static int debugLevel;
@@ -33,6 +35,7 @@ public class Settings {
 
 	private static Map<String, Integer> commands = new HashMap<>();
 	private static Map<String, String> reasons = new HashMap<>();
+
 
 	public static void load(ChatGuardPlugin pl) {
 		File fconfig = new File(pl.getDataFolder(), "config.yml");
@@ -55,25 +58,23 @@ public class Settings {
 		usePackets = config.getBoolean("Other settings.use packets");
 		separateWarnings = config.getBoolean("Warnings settings.separate");
 		hardmode = config.getBoolean("Hard mode");
-		cancelEnabled = config
-				.getBoolean("Messages.cancel if violation");
+		cancelEnabled = config.getBoolean("Messages.cancel if violation");
 		warnsEnabled = config.getBoolean("Warnings settings.enabled");
 		punishmentsEnabled = config.getBoolean("Punishment settings.enabled");
+		signsEnabled = config.getBoolean("Other settings.check signs");
 
 		replacement = config.getString("Messages.replacement");
 
-		maxWarnings = config.getInt("Warnings settings.max warnings");
+		maxWarnings = config.getInt("Warnings settings.max count");
 		debugLevel = config.getInt("Other settings.debug level");
 		cooldown = config.getInt("flood settings.message cooldown");
 
 		commands.clear();
 		for (String command : config
 				.getStringList("Other settings.check commands")) {
-			if (!command.contains(":")) {
-				continue;
-			}
-			String[] cmd = command.split(":");
-			if (Utils.isInt(cmd[1]) || Integer.parseInt(cmd[1]) < 0)
+			String[] cmd = command.split(Pattern.quote(":"));
+			if (cmd.length != 2 || !Utils.isInt(cmd[1])
+					|| Integer.parseInt(cmd[1]) < 0)
 				continue;
 			commands.put(cmd[0].toLowerCase(), Integer.parseInt(cmd[1]));
 		}
@@ -89,7 +90,7 @@ public class Settings {
 		}
 
 		if (debugLevel != 0) {
-			ChatGuardPlugin.debug(1, "Debugging level: " + getDebugLevel());
+			ChatGuardPlugin.debug(1, "Debug level: " + getDebugLevel());
 		}
 	}
 
@@ -166,6 +167,10 @@ public class Settings {
 
 	public static boolean isPunishmentsEnabled() {
 		return punishmentsEnabled;
+	}
+
+	public static boolean isSignsEnabled() {
+		return signsEnabled;
 	}
 
 }

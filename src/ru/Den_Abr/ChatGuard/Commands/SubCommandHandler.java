@@ -8,8 +8,8 @@ import org.bukkit.entity.Player;
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.ChatFilters.SwearFilter;
-import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Messages;
+import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
@@ -28,7 +28,12 @@ public class SubCommandHandler {
 			}
 			player = CGPlayer.get((Player) cs);
 		} else {
-			player = CGPlayer.get(Bukkit.getPlayer(args[0]));
+			if (cs.hasPermission("chatguard.info.others"))
+				player = CGPlayer.get(Bukkit.getPlayer(args[0]));
+			else {
+				cs.sendMessage(Message.NO_PERMS.get());
+				return;
+			}
 		}
 		if (null == player) {
 			cs.sendMessage(Message.PLAYER_NOT_FOUND.get());
@@ -88,7 +93,7 @@ public class SubCommandHandler {
 		}
 	}
 
-	@Cmd(desc = "Show your warnings or (Player)'s", name = "globalmute", perm = "chatguard.globalmute", args = "", max = 0)
+	@Cmd(desc = "Show your warnings or (Player)'s", name = "globalmute", perm = "chatguard.globalmute", max = 0)
 	public void globalmute(CommandSender cs, String[] args) {
 		// ya
 		PlayerListener.globalMute = !PlayerListener.globalMute;
@@ -99,7 +104,33 @@ public class SubCommandHandler {
 
 	@Cmd(desc = "Clear some warnings", name = "clear", perm = "chatguard.clearwarnings", args = "(Type) (Player)", max = 2)
 	public void clear(CommandSender cs, String[] args) {
-
+		if (args.length > 0) {
+			Violation v = Violation.get(args[0].toUpperCase());
+			if (v == null || v == Violation.BLACKCHAR) {
+				StringBuilder sb = new StringBuilder();
+				for (Violation allV : Violation.values()) {
+					if (allV.getPunishmentSection().equals("none"))
+						continue;
+					sb.append(allV).append(" ");// looks fine
+				}
+				cs.sendMessage(ChatColor.GOLD + "Available types: "
+						+ ChatColor.GREEN + sb.toString().trim());
+				return;
+			}
+			if (args.length == 1) {
+				CGPlayer.clearAllWarnings(v, true);
+			} else if (args.length == 2) {
+				Player p = Bukkit.getPlayer(args[0]);
+				if (p == null || !p.isOnline() /* hello cauldron */) {
+					cs.sendMessage(Message.PLAYER_NOT_FOUND.get());
+					return;
+				}
+				CGPlayer.get(p).clearWarnings(v, true);
+			}
+		} else
+			CGPlayer.clearAllWarnings(null, false);
+		cs.sendMessage(Message.SUCCESSFULLY.get());
+		
 	}
 
 	@Cmd(desc = "Warn [Player]", name = "warn", perm = "chatguard.warn", args = "[Player] [Type]", min = 2, max = 2)
@@ -127,7 +158,7 @@ public class SubCommandHandler {
 		cs.sendMessage(Message.SUCCESSFULLY.get());
 	}
 
-	@Cmd(desc = "Reload plugin configurations", name = "reload", perm = "chatguard.reload", args = "", max = 0)
+	@Cmd(desc = "Reload plugin configurations", name = "reload", perm = "chatguard.reload", max = 0)
 	public void reload(CommandSender cs, String[] args) {
 		Settings.load(ChatGuardPlugin.getInstance());
 		Messages.load(ChatGuardPlugin.getInstance());
@@ -136,7 +167,7 @@ public class SubCommandHandler {
 		cs.sendMessage(ChatColor.GRAY + "Reload complete.");
 	}
 
-	@Cmd(desc = "Show this page", name = "help", perm = "", args = "")
+	@Cmd(desc = "Show this page", name = "help", perm = "")
 	public void help(CommandSender cs, String[] args) {
 		cs.sendMessage(ChatColor.GOLD
 				+ ChatGuardPlugin.getInstance().getDescription().getName()

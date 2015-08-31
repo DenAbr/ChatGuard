@@ -3,6 +3,7 @@ package ru.Den_Abr.ChatGuard.ChatFilters;
 import java.util.HashSet;
 import java.util.Set;
 
+import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.MessageInfo;
 import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
@@ -14,6 +15,14 @@ public abstract class AbstractFilter implements Filter {
 
 	public static Set<Filter> getActiveFilters() {
 		return activeFilters;
+	}
+
+	public static void addMetrics() {
+		if (ChatGuardPlugin.metrics == null)
+			return;
+		for (Filter f : getActiveFilters()) {
+			f.addMetricsGraph();
+		}
 	}
 
 	public static MessageInfo handleMessage(String mes, CGPlayer player) {

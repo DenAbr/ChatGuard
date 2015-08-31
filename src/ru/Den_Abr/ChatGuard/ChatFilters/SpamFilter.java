@@ -7,11 +7,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
+import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
+import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
-import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
+import thirdparty.org.mcstats.Metrics.Graph;
+import thirdparty.org.mcstats.Metrics.Plotter;
 
 public class SpamFilter extends AbstractFilter {
 	private Pattern ipPattern;
@@ -124,8 +127,20 @@ public class SpamFilter extends AbstractFilter {
 		maxNums = cs.getInt("max numbers");
 		replacement = ChatColor.translateAlternateColorCodes('&',
 				cs.getString("custom replacement"));
+		
+		
 		getActiveFilters().add(this);
 		return;
 	}
-
+	@Override
+	public void addMetricsGraph() {
+		Graph g = ChatGuardPlugin.metrics.getOrCreateGraph("Filters used");
+		g.addPlotter(new Plotter("Spam filter") {
+			
+			@Override
+			public int getValue() {
+				return 1;
+			}
+		});
+	}
 }

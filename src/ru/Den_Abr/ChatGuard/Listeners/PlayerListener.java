@@ -62,15 +62,18 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerCommand(PlayerCommandPreprocessEvent e) {
-		if (AbstractIntegration.shouldSkip(e.getPlayer()))
+		if (AbstractIntegration.shouldSkip(e.getPlayer()) || Settings.getCheckCommands().isEmpty())
 			return;
 		String comand = e.getMessage().split(" ")[0].toLowerCase();
+		ChatGuardPlugin.debug(2, comand);
+		ChatGuardPlugin.debug(2, Settings.getCheckCommands());
 		if (!Settings.getCheckCommands().containsKey(comand))
 			return;
 		String[] words = e.getMessage().split(" ");
 		int offset = Settings.getCheckCommands().get(comand) + 1;
 		words = (String[]) Arrays.copyOfRange(words, offset, words.length);
 		String message = String.join(" ", words);
+		ChatGuardPlugin.debug(2, message);
 		if (message.isEmpty())
 			return;
 
@@ -93,9 +96,20 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onSignChange(SignChangeEvent e) {
-		if (AbstractIntegration.shouldSkip(e.getPlayer())) // lol?
+		if (AbstractIntegration.shouldSkip(e.getPlayer()) /* lol? */ || !Settings.isSignsEnabled())
 			return;
+		CGPlayer player = CGPlayer.get(e.getPlayer());
+		for (int i = 0; i < e.getLines().length; i++) {
+			String line = e.getLine(i);
+			MessageInfo info = AbstractFilter.handleMessage(line, player);
+			e.setLine(i, info.getClearMessage());
 
+			if (!info.getViolations().isEmpty()) {
+				if (Settings.isCancellingEnabled()) {
+					e.setCancelled(true);
+				}
+			}
+		}
 	}
 
 	private int isCooldownOver(CGPlayer pl) {

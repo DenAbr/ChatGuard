@@ -31,6 +31,8 @@ public abstract class CGPlayer {
 
 	public abstract Player getPlayer();
 
+	public abstract void updatePlayer(Player p);
+
 	public long getLastMessageTime() {
 		return lastMessage;
 	}
@@ -73,11 +75,19 @@ public abstract class CGPlayer {
 			return null;
 		CGPlayer temp = new LegacyChatPlayer(p);
 		if (cache.contains(new LegacyChatPlayer(p))) {
-			return cache.get(cache.indexOf(temp));
+			CGPlayer player = cache.get(cache.indexOf(temp));
+			player.updatePlayer(p);
+			return player;
 		}
 		ChatGuardPlugin.debug(2, cache);
 		cache.add(temp);
 		return temp;
+	}
+
+	public static void clearAllWarnings(Violation v, boolean separate) {
+		for (CGPlayer player : cache) {
+			player.clearWarnings(v, separate);
+		}
 	}
 
 	public int getViolationCount(Violation v, boolean separately) {
@@ -107,7 +117,7 @@ public abstract class CGPlayer {
 		}
 	}
 
-	private void clearWarnings(Violation v, boolean separatedWarnings) {
+	public void clearWarnings(Violation v, boolean separatedWarnings) {
 		if (!separatedWarnings) {
 			violations.clear();
 			return;
@@ -166,7 +176,9 @@ public abstract class CGPlayer {
 					Message.FLOODING.get().replace("{WARNS}", warnFormat));
 			break;
 		default:
+			ChatGuardPlugin.debug(0, "Magic Violation type " + v);
 			break;
 		}
 	}
+
 }

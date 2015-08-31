@@ -8,6 +8,7 @@ public interface Filter {
 	public Violation checkMessage(String message, CGPlayer player);
 	public String getClearMessage(String message, CGPlayer player);
 	public int getMaxWarnings();
+	public void addMetricsGraph();
 	public void register();
 	
 }

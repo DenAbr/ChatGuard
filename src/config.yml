@@ -10,6 +10,7 @@ Version: 1
 Check for updates: true
 
 # NOTICE: Enabling Hard Mode enables message cancelling automatically 
+# is not complete function
 Hard mode: false
 
 # Max warnings and custom replacement work only if Separated warnings are enabled

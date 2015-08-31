@@ -5,10 +5,13 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
+import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
+import thirdparty.org.mcstats.Metrics.Graph;
+import thirdparty.org.mcstats.Metrics.Plotter;
 
 public class FloodFilter extends AbstractFilter {
 	private boolean informAdmins;
@@ -32,7 +35,7 @@ public class FloodFilter extends AbstractFilter {
 						+ TimeUnit.SECONDS.toMillis(floodTime) < System
 							.currentTimeMillis())
 			return v;
-		
+
 		String wws = message.replaceAll("\\s+", " ").toLowerCase();
 		for (String lm : player.getLastMessages()) {
 			lm = lm.replaceAll("\\s+", " ").toLowerCase();
@@ -48,10 +51,11 @@ public class FloodFilter extends AbstractFilter {
 	}
 
 	private void informAdmins(CGPlayer player, String message) {
-		String complete = Message.INFORM_FLOOD.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message);
+		String complete = Message.INFORM_FLOOD.get()
+				.replace("{PLAYER}", player.getName())
+				.replace("{MESSAGE}", message);
 		Bukkit.getConsoleSender().sendMessage(complete);
-		Bukkit.broadcast(complete,
-				"chatguard.inform.flood");
+		Bukkit.broadcast(complete, "chatguard.inform.flood");
 	}
 
 	@Override
@@ -73,4 +77,15 @@ public class FloodFilter extends AbstractFilter {
 		getActiveFilters().add(this);
 	}
 
+	@Override
+	public void addMetricsGraph() {
+		Graph g = ChatGuardPlugin.metrics.getOrCreateGraph("Filters used");
+		g.addPlotter(new Plotter("Flood filter") {
+
+			@Override
+			public int getValue() {
+				return 1;
+			}
+		});
+	}
 }

@@ -1,5 +1,6 @@
 package ru.Den_Abr.ChatGuard;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
@@ -17,16 +18,19 @@ import ru.Den_Abr.ChatGuard.Configuration.Messages;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
 import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
+import ru.Den_Abr.ChatGuard.Integration.AuthMe34;
+import ru.Den_Abr.ChatGuard.Integration.AuthMe5;
 import ru.Den_Abr.ChatGuard.Integration.AuthMeLegacy;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 import thirdparty.net.gravitydevelopment.updater.Updater;
 import thirdparty.net.gravitydevelopment.updater.Updater.UpdateType;
-import thirdparty.org.mcstats.MetricsLite;
+import thirdparty.org.mcstats.Metrics;
 
 public class ChatGuardPlugin extends JavaPlugin {
 	private static ChatGuardPlugin instance;
+	public static Metrics metrics;
 
 	@Override
 	public void onEnable() {
@@ -41,14 +45,18 @@ public class ChatGuardPlugin extends JavaPlugin {
 		Messages.load(this);
 		Whitelist.load(this);
 
-		startMetrics();
-		if (!setupProtocol()) {
-			getServer().getPluginManager().registerEvents(new PlayerListener(),
-					this);
-		}
+		initMetrics();
+		// if (!setupProtocol()) { packet listening is not ready
+		getServer().getPluginManager().registerEvents(new PlayerListener(),
+				this);
+		// }
 		registerIntegratedPlugins();
 		registerFilters();
 		loadOnlinePlayers();
+		
+		AbstractFilter.addMetrics();
+		startMetrics();
+		
 		getLogger().info("ChatGuard enabled!");
 	}
 
@@ -63,6 +71,8 @@ public class ChatGuardPlugin extends JavaPlugin {
 
 		// you can do it from your's plugins
 		new AuthMeLegacy().register();
+		new AuthMe34().register();
+		new AuthMe5().register();
 	}
 
 	// the same as integration
@@ -74,19 +84,24 @@ public class ChatGuardPlugin extends JavaPlugin {
 		new CapsFilter().register();
 		new SpamFilter().register();
 		new SwearFilter().register();
+		
 	}
 
-	private void startMetrics() {
+	private void initMetrics() {
 		try {
-			MetricsLite metrics = new MetricsLite(this);
-			metrics.start();
-		} catch (Exception e) {
-			getLogger().info("Failed to connect with Metrics");
+			metrics = new Metrics(this);
+		} catch (IOException e) {
+			getLogger().warning("Failed to init metrics");
 		}
 	}
 
+	private void startMetrics() {
+		if(null != metrics)
+		metrics.start();
+	}
+
 	private void checkForUpdates() {
-		new Updater(this, 50092, getFile(), UpdateType.NO_DOWNLOAD, true);
+		new Updater(this, 50092, getFile(), UpdateType.DEFAULT, true);
 	}
 
 	public static ChatGuardPlugin getInstance() {
@@ -110,7 +125,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		PacketsListener.stopListening();
+		// PacketsListener.stopListening(); later
 		getServer().getScheduler().cancelTasks(this);
 	}
 
@@ -118,7 +133,8 @@ public class ChatGuardPlugin extends JavaPlugin {
 		if (level > Settings.getDebugLevel())
 			return;
 		for (Object obj : o)
-			getInstance().getLogger().info("[DEBUG] " + obj.toString());
+			getInstance().getLogger().info(
+					"[DEBUG " + level + "] " + obj.toString());
 	}
 
 	public static Logger getLog() {

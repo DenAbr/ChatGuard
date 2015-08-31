@@ -2,12 +2,12 @@ package ru.Den_Abr.ChatGuard.Listeners;
 
 import org.bukkit.plugin.Plugin;
 
+import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
+
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-
-import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 
 public class PacketsListener extends PacketAdapter {
 	private static PacketsListener instance;
