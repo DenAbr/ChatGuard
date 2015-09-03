@@ -26,9 +26,9 @@ public class AuthMe5 extends AbstractIntegration {
 		Plugin pl = Bukkit.getPluginManager().getPlugin("AuthMe");
 		if (null == pl)
 			return false;
-		if (Utils.isInt(pl.getDescription().getVersion().split(".")[0])
+		if (Utils.isInt(pl.getDescription().getVersion().split("\\.")[0])
 				&& Integer
-						.parseInt(pl.getDescription().getVersion().split(".")[0]) >= 5) {
+						.parseInt(pl.getDescription().getVersion().split("\\.")[0]) >= 5) {
 			plugin = (JavaPlugin) pl;
 		}
 		return plugin != null && pl.isEnabled();

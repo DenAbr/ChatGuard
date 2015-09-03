@@ -93,7 +93,7 @@ public class SubCommandHandler {
 		}
 	}
 
-	@Cmd(desc = "Show your warnings or (Player)'s", name = "globalmute", perm = "chatguard.globalmute", max = 0)
+	@Cmd(desc = "Toggle global mute", name = "globalmute", perm = "chatguard.globalmute", max = 0)
 	public void globalmute(CommandSender cs, String[] args) {
 		// ya
 		PlayerListener.globalMute = !PlayerListener.globalMute;

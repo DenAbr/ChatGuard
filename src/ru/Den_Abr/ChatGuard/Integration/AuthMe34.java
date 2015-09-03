@@ -5,8 +5,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import ru.Den_Abr.ChatGuard.Utils.Utils;
 import fr.xephi.authme.api.API;
+import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class AuthMe34 extends AbstractIntegration {
 	private JavaPlugin plugin;
@@ -27,9 +27,9 @@ public class AuthMe34 extends AbstractIntegration {
 		if (null == pl)
 			return false;
 		if (pl.getDescription().getAuthors().get(0).equals("Xephi59")
-				&& Utils.isInt(pl.getDescription().getVersion().split(".")[0])
+				&& Utils.isInt(pl.getDescription().getVersion().split("\\.")[0])
 				&& Integer
-						.parseInt(pl.getDescription().getVersion().split(".")[0]) < 5) {
+						.parseInt(pl.getDescription().getVersion().split("\\.")[0]) < 5) {
 			plugin = (JavaPlugin) pl;
 		}
 		return plugin != null && pl.isEnabled();
