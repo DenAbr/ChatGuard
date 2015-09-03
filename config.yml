@@ -1,0 +1,110 @@
+# ---------------------- ChatGuard 7.0 default configuration file --------------------- #
+#                Конфигурация старых версий плагина перенесена в папку old              #
+#        Читайте коментарии к настройкам и не задавайте глупых вопросов автору          #
+#Не используйте стандартные настройки табуляции в Notepad++. Включите Заменять пробелом #
+# ------------------------------------------------------------------------------------- #
+
+# не трогать
+Version: 1
+
+# проверка обновлений
+Check for updates: true
+
+# ВНИМАНИЕ: включение Хард мода автоматически включает настройку Messages.cancel if violation
+# функция не реализована на данный момент
+Hard mode: false
+
+# Настройки max warnings и custom replacement работают только при включении Warnings settings.separate
+swear settings:
+    # активация фильтра
+    enabled: true
+    # информировать модеров/админов
+    inform admins: true
+    # максимальное количество предупреждений за этот вид нарушений
+    max warnings: 10
+    # заменитель мат слов, поддерживает цвета
+    custom replacement: '<bad word>'
+caps settings:
+    enabled: true
+    inform admins: true
+    max warnings: 10
+    # максимальный процент капса в сообщении
+    max caps percent: 60
+    # минимальная длина сообщения для проверки(полезно для пропуска смайлов)
+    min message lenght: 3
+flood settings:
+    enabled: true
+    inform admins: true
+    max warnings: 10
+    # период, когда можно писать одно и то же сообщение снова, в секундах
+    flood time: 10
+    # время, через которое игрок может снова писать в чат, для отключения поставить на 0
+    message cooldown: 5
+    # сколько последних сообщений игроков проверять на флуд. 1 - последнее, 2 - и предпоследнее и так далее
+    flood levels: 1
+spam settings:
+    enabled: true
+    inform admins: true
+    max warnings: 10
+    # менять только, если что-то смыслите в регулярках
+    domain regexp: '([0-9a-z]{2,}\.)+(ru|com|org|ua|su|tv|net|biz|info|name|mobi|kz|by|lv|eu|tk)(:\d*)?'
+    ip regexp: '((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))'
+    custom replacement: '<spam>'
+    # сколько чисел можно писать в одном сообщении, для отключения поставить на 0
+    max numbers: 3
+Messages:
+    # если выключено, то непотребства в сообщении будут заменены на соответствующую нарушению замену, при включении сообщения с нарушениями будут отменяться
+    cancel if violation: true
+    # работает только если Warnings.separate выключена
+    replacement: '<censored>'
+    # включение фильтрации нестандартных символов
+    enable character whitelist: true
+Warnings settings:
+    # если выключено, игрок будет получать уведомления о том, что он нарушил правила чата
+    enabled: true
+    # если включено, для каждого нарушения будет своё количество максимальных предупреждений и слово-замена
+    separate: true
+    # максимальное число предупреждений игроку, работает только если настройка выше выключена
+    max count: 10
+Punishment settings:
+    # если выключено, игроки не будут наказываться за нарушения
+    enabled: true
+    # Секция шаблонов-причин. Вы можете добавить сколько угодно шаблонов-причин с любым содержанием и использовать их в командах наказания, очень хорошо если вы найдёте этому полезное применение
+    reasons: 
+        1: '{Player} kicked because he is bad boy'
+        second: '{Player} banned for capsing'
+        another: '{Player} killed for spamming'
+        flooder: 'Our chat was flooded because of {Player}'
+        silent: '-s'
+        mute-time: '1h'
+    commands:
+        custom: false
+        # common команды выполняются только если custom отключена, иначе для каждого нарушения будет использован свой список команд для наказания
+        # чтобы использовать шаблон-причину из секции выше, просто добавьте тег {Reason_ИДЕНТИФИКАТОР}
+        # команды исполняются от консоли
+        common commands:
+            - kill {Player}
+            - ban {Player} 1d {Reason_1} {Reason_silent}
+        swear commands:
+            - mute {Player} {Reason_mute-time}
+            - broadcast {Reason_1}
+        caps commands:
+            - mute {Player} {Reason_mute-time}
+            - broadcast {Reason_capsing}
+        flood commands:
+            - mute {Player} {Reason_mute-time}
+            - broadcast {Reason_flooder}
+        spam commands:
+            - kick {Player} {Reason_another}
+            - broadcast {Reason_another}
+Other settings:
+    # проверка табличек на мат и капс
+    check signs: true
+    # проверять команды игроков на наличие рекламы, мата, капса и флуда. полезно для личных сообщений
+    # для отключения поставьте значение []. цифра после двоеточия означает, сколько слов от команды надо пропустить(обычно ник)
+    check commands: ['/me:0', '/msg:1', '/tell:1', '/w:1', '/r:0']
+    # включать только если разработчик попросит
+    debug level: 0
+    # если стандартная система обработки сообщений не работает из-за несовместимости с некоторыми плагинами, можно слушать в обход них, через пакеты
+    # не реализовано
+    use packets: false
