@@ -10,7 +10,7 @@ Version: 1
 Check for updates: true
 
 # NOTICE: Enabling Hard Mode enables message cancelling automatically 
-# is not complete function
+# experimental function
 Hard mode: false
 
 # Max warnings and custom replacement work only if Separated warnings are enabled
@@ -49,7 +49,7 @@ spam settings:
     # set how many numbers can players send in one message, 0 - disable
     max numbers: 3
 Messages:
-    # message will be modified to normal if disabled
+    # bad words and spam will be replaced with appropriate replacement if disabled
     cancel if violation: true
     # works only if separated warnings are enabled
     replacement: '<censored>'

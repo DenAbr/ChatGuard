@@ -23,6 +23,7 @@ import ru.Den_Abr.ChatGuard.Integration.AuthMe5;
 import ru.Den_Abr.ChatGuard.Integration.AuthMeLegacy;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
+import ru.Den_Abr.ChatGuard.Listeners.SignListener;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 import thirdparty.net.gravitydevelopment.updater.Updater;
 import thirdparty.net.gravitydevelopment.updater.Updater.UpdateType;
@@ -46,17 +47,17 @@ public class ChatGuardPlugin extends JavaPlugin {
 		Whitelist.load(this);
 
 		initMetrics();
-		// if (!setupProtocol()) { packet listening is not ready
-		getServer().getPluginManager().registerEvents(new PlayerListener(),
-				this);
-		// }
+		if (!setupProtocol()) {
+			getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+		}
+		getServer().getPluginManager().registerEvents(new SignListener(), this);
 		registerIntegratedPlugins();
 		registerFilters();
 		loadOnlinePlayers();
-		
+
 		AbstractFilter.addMetrics();
 		startMetrics();
-		
+
 		getLogger().info("ChatGuard enabled!");
 	}
 
@@ -84,7 +85,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 		new CapsFilter().register();
 		new SpamFilter().register();
 		new SwearFilter().register();
-		
+
 	}
 
 	private void initMetrics() {
@@ -96,8 +97,8 @@ public class ChatGuardPlugin extends JavaPlugin {
 	}
 
 	private void startMetrics() {
-		if(null != metrics)
-		metrics.start();
+		if (null != metrics)
+			metrics.start();
 	}
 
 	private void checkForUpdates() {
@@ -118,14 +119,14 @@ public class ChatGuardPlugin extends JavaPlugin {
 			PacketsListener.startListening();
 			return true;
 		} else
-			getLogger().info(
-					"Install ProtocolLib to enable 'use packets' setting");
+			getLogger().info("Install ProtocolLib to enable 'use packets' setting");
 		return false;
 	}
 
 	@Override
 	public void onDisable() {
-		// PacketsListener.stopListening(); later
+		if (Settings.useProtocol())
+			PacketsListener.stopListening();
 		getServer().getScheduler().cancelTasks(this);
 	}
 
@@ -133,8 +134,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 		if (level > Settings.getDebugLevel())
 			return;
 		for (Object obj : o)
-			getInstance().getLogger().info(
-					"[DEBUG " + level + "] " + obj.toString());
+			getInstance().getLogger().info("[DEBUG " + level + "] " + obj);
 	}
 
 	public static Logger getLog() {

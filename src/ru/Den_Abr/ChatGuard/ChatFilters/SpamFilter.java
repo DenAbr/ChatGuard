@@ -28,9 +28,12 @@ public class SpamFilter extends AbstractFilter {
 	public Violation checkMessage(String message, CGPlayer player) {
 		if (player.hasPermission("chatguard.ignore.spam"))
 			return null;
-
-		Matcher ipMatcher = ipPattern.matcher(message);
-		Matcher domMatcher = domainPattern.matcher(message);
+		String checkMessage = message;
+		if (Settings.isHardMode()) {
+			checkMessage = checkMessage.replace(" ", "");
+		}
+		Matcher ipMatcher = ipPattern.matcher(checkMessage);
+		Matcher domMatcher = domainPattern.matcher(checkMessage);
 		Violation v = null;
 		while (ipMatcher.find()) {
 			if (Whitelist.isWhitelisted(ipMatcher.group()))
@@ -44,7 +47,7 @@ public class SpamFilter extends AbstractFilter {
 		}
 		if (maxNums > 0) {
 			int charCount = 0;
-			for (char c : message.replaceAll(" ", "").toCharArray()) {
+			for (char c : message.replace(" ", "").toCharArray()) {
 				if (Character.isDigit(c)) {
 					charCount++;
 				}

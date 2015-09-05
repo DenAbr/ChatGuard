@@ -58,7 +58,8 @@ public class Settings {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			pl.saveResource("config.yml", true);
+			fconfig.delete();
+			pl.saveResource("config.yml", false);
 			config = YamlConfiguration.loadConfiguration(fconfig);
 		}
 
@@ -181,4 +182,5 @@ public class Settings {
 		return signsEnabled;
 	}
 
+	
 }

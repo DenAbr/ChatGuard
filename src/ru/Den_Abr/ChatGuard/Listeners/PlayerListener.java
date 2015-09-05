@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
@@ -19,7 +18,12 @@ import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 
 public class PlayerListener implements Listener {
+	private static PlayerListener instance;
 	public static boolean globalMute = false;
+
+	public PlayerListener() {
+		instance = this;
+	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
@@ -37,9 +41,7 @@ public class PlayerListener implements Listener {
 			ChatGuardPlugin.debug(1, player.getName() + " CD " + cdtime);
 			if (cdtime > 0) {
 				e.setCancelled(true);
-				e.getPlayer().sendMessage(
-						Message.WAIT_COOLDOWN.get().replace("{TIME}",
-								cdtime + Message.SEC.get()));
+				e.getPlayer().sendMessage(Message.WAIT_COOLDOWN.get().replace("{TIME}", cdtime + Message.SEC.get()));
 				return;
 			}
 		}
@@ -71,15 +73,23 @@ public class PlayerListener implements Listener {
 			return;
 		String[] words = e.getMessage().split(" ");
 		int offset = Settings.getCheckCommands().get(comand) + 1;
-		words = (String[]) Arrays.copyOfRange(words, offset, words.length);
-		String message = String.join(" ", words);
+
+		String skipped = "";
+		if (offset > 1) {
+			skipped = String.join(" ", Arrays.copyOfRange(words, 1, offset)) + " ";
+		}
+		String message = String.join(" ", Arrays.copyOfRange(words, offset, words.length));
 		ChatGuardPlugin.debug(2, message);
+		ChatGuardPlugin.debug(2, skipped);
+
+		comand += " " + skipped;
+
 		if (message.isEmpty())
 			return;
 
 		CGPlayer player = CGPlayer.get(e.getPlayer());
 		MessageInfo info = AbstractFilter.handleMessage(message, player);
-		e.setMessage(comand + " " + info.getClearMessage());
+		e.setMessage(comand + info.getClearMessage());
 
 		if (!info.getViolations().isEmpty()) {
 			if (Settings.isCancellingEnabled()) {
@@ -94,37 +104,21 @@ public class PlayerListener implements Listener {
 		player.getLastMessages().add(e.getMessage());
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onSignChange(SignChangeEvent e) {
-		if (AbstractIntegration.shouldSkip(e.getPlayer()) /* lol? */ || !Settings.isSignsEnabled())
-			return;
-		CGPlayer player = CGPlayer.get(e.getPlayer());
-		for (int i = 0; i < e.getLines().length; i++) {
-			String line = e.getLine(i);
-			MessageInfo info = AbstractFilter.handleMessage(line, player);
-			e.setLine(i, info.getClearMessage());
-
-			if (!info.getViolations().isEmpty()) {
-				if (Settings.isCancellingEnabled()) {
-					e.setCancelled(true);
-				}
-			}
-		}
-	}
-
-	private int isCooldownOver(CGPlayer pl) {
+	public static int isCooldownOver(CGPlayer pl) {
 		if (!Settings.isCooldownEnabled()) {
 			return 0;
 		}
 		if (pl.getLastMessageTime() != -1) {
-			long overtime = pl.getLastMessageTime()
-					+ TimeUnit.SECONDS.toMillis(Settings.getCooldown());
-			double offset = Math.ceil((double) (overtime - System
-					.currentTimeMillis()) / 1000);
+			long overtime = pl.getLastMessageTime() + TimeUnit.SECONDS.toMillis(Settings.getCooldown());
+			double offset = Math.ceil((double) (overtime - System.currentTimeMillis()) / 1000);
 			if (offset > 0) {
 				return (int) offset;
 			}
 		}
 		return 0;
+	}
+
+	public static PlayerListener getInstance() {
+		return instance;
 	}
 }

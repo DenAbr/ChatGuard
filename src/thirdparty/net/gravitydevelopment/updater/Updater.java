@@ -76,7 +76,7 @@ public class Updater {
 	private static final String API_KEY_DEFAULT = "PUT_API_KEY_HERE";
 	// Default disable value in config
 	private static final boolean DISABLE_DEFAULT = false;
-
+	
 	/* User-provided variables */
 
 	// Plugin running Updater
@@ -674,7 +674,7 @@ public class Updater {
 	 *         false if not.
 	 */
 	public boolean shouldUpdate(String localVersion, String remoteVersion) {
-		return !localVersion.equalsIgnoreCase(remoteVersion);
+		return parseVersion(localVersion).compare(parseVersion(remoteVersion));
 	}
 
 	/**
@@ -824,5 +824,105 @@ public class Updater {
 
 	private void runCallback() {
 		this.callback.onFinish(this);
+	}
+
+	/**
+	 * Quick method for parsing version strings
+	 *
+	 * @param version
+	 *            semver string to parse
+	 * @return {@link de.albionco.updater.Version} if valid semver string
+	 */
+	public static Version parseVersion(String version) {
+		String[] spl = version.split("\\.");
+
+		int x = Integer.parseInt(spl[0]);
+		int y = Integer.parseInt(spl[1]);
+		int z = spl.length == 3 ? Integer.parseInt(spl[2]) : 0;
+
+		return new Version(x, y, z);
+	}
+
+	static class Version {
+
+
+		/**
+		 * Store the version major.
+		 */
+		private final int major;
+
+		/**
+		 * Store the version minor.
+		 */
+		private final int minor;
+
+		/**
+		 * Store the version patch.
+		 */
+		private final int patch;
+
+		/**
+		 * Create a new instance of the {@link de.albionco.updater.Version}
+		 * class.
+		 *
+		 * @param major
+		 *            semver major
+		 * @param minor
+		 *            semver minor
+		 * @param patch
+		 *            semver patch
+		 */
+		protected Version(int major, int minor, int patch) {
+			this.major = major;
+			this.minor = minor;
+			this.patch = patch;
+		}
+
+		/**
+		 * @return semver major
+		 */
+		public int getMajor() {
+			return major;
+		}
+
+		/**
+		 * @return semver minor
+		 */
+		public int getMinor() {
+			return minor;
+		}
+
+		/**
+		 * @return semver patch
+		 */
+		public int getPatch() {
+			return patch;
+		}
+
+		/**
+		 * @return joined version string.
+		 */
+		@Override
+		public String toString() {
+			return major + "." + minor + "." + patch;
+		}
+
+		/**
+		 * Little method to see if the input version is greater than ours.
+		 *
+		 * @param version
+		 *            input {@link de.albionco.updater.Version} object
+		 * @return true if the version is greater than ours
+		 */
+		public boolean compare(Version version) {
+			int result = version.getMajor() - this.getMajor();
+			if (result == 0) {
+				result = version.getMinor() - this.getMinor();
+				if (result == 0) {
+					result = version.getPatch() - this.getPatch();
+				}
+			}
+			return result > 0;
+		}
 	}
 }
