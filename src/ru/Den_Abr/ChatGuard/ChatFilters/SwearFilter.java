@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+
+import com.google.common.io.Files;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
@@ -20,8 +23,6 @@ import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 import thirdparty.org.mcstats.Metrics.Graph;
 import thirdparty.org.mcstats.Metrics.Plotter;
-
-import com.google.common.io.Files;
 
 public class SwearFilter extends AbstractFilter {
 	private static Pattern swearPattern;
@@ -37,7 +38,7 @@ public class SwearFilter extends AbstractFilter {
 			checkMessage = checkMessage.replaceAll(" ", "").replaceAll("[^A-Za-zА-Яа-яà-ÿÀ-ß]", "");
 		}
 		Violation v = null;
-		Matcher swearMatcher = swearPattern.matcher(checkMessage);
+		Matcher swearMatcher = swearPattern.matcher(checkMessage.toLowerCase());
 		while (swearMatcher.find()) {
 			if (Whitelist.isWhitelisted(swearMatcher.group()))
 				continue;
@@ -59,14 +60,26 @@ public class SwearFilter extends AbstractFilter {
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
-		Matcher swearMatcher = swearPattern.matcher(message);
+		Matcher swearMatcher = swearPattern.matcher(message.toLowerCase());
+		List<String> toReplace = new ArrayList<>();
 		while (swearMatcher.find()) {
 			String group = swearMatcher.group();
 			if (Whitelist.isWhitelisted(group)) {
 				continue;
 			}
-			message = message.replace(group, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
+			String found = message.substring(swearMatcher.start(), swearMatcher.end()); // ignorecase
+																						// pattern
+																						// flag
+																						// applies
+																						// only
+																						// on
+																						// english
+																						// characters
+			toReplace.add(found);
 		}
+		for (String s : toReplace)
+			message = message.replace(s, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
+
 		return message;
 	}
 
