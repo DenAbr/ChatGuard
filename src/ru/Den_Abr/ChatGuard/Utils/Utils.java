@@ -35,6 +35,28 @@ public class Utils {
 
 	}
 
+	public static String getWord(String message, int start, int end) {
+		int wordStart = 0;
+		int wordEnd = message.length();
+
+		char[] chars = message.toCharArray();
+		for (int i = start; i >= 0; i--) {
+			if (chars[i] == ' ') {
+				wordStart = i;
+				break;
+			}
+		}
+		for (int i = end; i < message.length(); i++) {
+			if (chars[i] == ' ') {
+				wordEnd = i;
+				break;
+			}
+		}
+
+		String word = message.substring(wordStart, wordEnd);
+		return word.trim();
+	}
+	
 	public static boolean isInt(String string) {
 		try {
 			Integer.parseInt(string);

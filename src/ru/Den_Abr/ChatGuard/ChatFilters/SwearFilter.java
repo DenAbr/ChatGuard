@@ -21,6 +21,7 @@ import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
+import ru.Den_Abr.ChatGuard.Utils.Utils;
 import thirdparty.org.mcstats.Metrics.Graph;
 import thirdparty.org.mcstats.Metrics.Plotter;
 
@@ -40,7 +41,8 @@ public class SwearFilter extends AbstractFilter {
 		Violation v = null;
 		Matcher swearMatcher = swearPattern.matcher(checkMessage.toLowerCase());
 		while (swearMatcher.find()) {
-			if (Whitelist.isWhitelisted(swearMatcher.group()))
+			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
+			if (Whitelist.isWhitelisted(found.toLowerCase()))
 				continue;
 			v = Violation.SWEAR;
 		}
@@ -63,18 +65,10 @@ public class SwearFilter extends AbstractFilter {
 		Matcher swearMatcher = swearPattern.matcher(message.toLowerCase());
 		List<String> toReplace = new ArrayList<>();
 		while (swearMatcher.find()) {
-			String group = swearMatcher.group();
-			if (Whitelist.isWhitelisted(group)) {
+			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
+			if (Whitelist.isWhitelisted(found.toLowerCase()))
 				continue;
-			}
-			String found = message.substring(swearMatcher.start(), swearMatcher.end()); // ignorecase
-																						// pattern
-																						// flag
-																						// applies
-																						// only
-																						// on
-																						// english
-																						// characters
+
 			toReplace.add(found);
 		}
 		for (String s : toReplace)

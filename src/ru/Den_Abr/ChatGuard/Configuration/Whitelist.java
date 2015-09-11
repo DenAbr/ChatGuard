@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
-
 import com.google.common.io.Files;
+
+import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 
 public class Whitelist {
 	private static List<Pattern> whitelisted = new ArrayList<>();
@@ -24,8 +24,7 @@ public class Whitelist {
 			for (String line : Files.readLines(wlFile, StandardCharsets.UTF_8)) {
 				if (line.isEmpty())
 					continue;
-				whitelisted
-						.add(Pattern.compile(line, Pattern.CASE_INSENSITIVE));
+				whitelisted.add(Pattern.compile(line, Pattern.CASE_INSENSITIVE));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -43,6 +42,7 @@ public class Whitelist {
 	}
 
 	public static boolean isWhitelisted(String found) {
+		ChatGuardPlugin.debug(2, found);
 		for (Pattern p : whitelisted) {
 			if (p.matcher(found).find())
 				return true;
