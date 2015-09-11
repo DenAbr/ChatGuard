@@ -55,7 +55,6 @@ public class ChatGuardPlugin extends JavaPlugin {
 		registerFilters();
 		loadOnlinePlayers();
 
-		AbstractFilter.addMetrics();
 		startMetrics();
 
 		getLogger().info("ChatGuard enabled!");

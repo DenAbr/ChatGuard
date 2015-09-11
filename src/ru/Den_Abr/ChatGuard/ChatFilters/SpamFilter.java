@@ -127,7 +127,8 @@ public class SpamFilter extends AbstractFilter {
 		replacement = ChatColor.translateAlternateColorCodes('&',
 				cs.getString("custom replacement"));
 		
-		
+		addMetricsGraph();
+
 		getActiveFilters().add(this);
 		return;
 	}
