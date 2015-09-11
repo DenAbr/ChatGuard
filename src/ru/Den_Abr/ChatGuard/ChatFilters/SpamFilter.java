@@ -36,12 +36,12 @@ public class SpamFilter extends AbstractFilter {
 		Matcher domMatcher = domainPattern.matcher(checkMessage);
 		Violation v = null;
 		while (ipMatcher.find()) {
-			if (Whitelist.isWhitelisted(checkMessage))
+			if (Whitelist.isWhitelisted(ipMatcher.group()))
 				continue;
 			v = Violation.SPAM;
 		}
 		while (domMatcher.find()) {
-			if (Whitelist.isWhitelisted(checkMessage))
+			if (Whitelist.isWhitelisted(domMatcher.group()))
 				continue;
 			v = Violation.SPAM;
 		}
