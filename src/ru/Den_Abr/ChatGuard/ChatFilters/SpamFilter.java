@@ -46,13 +46,9 @@ public class SpamFilter extends AbstractFilter {
 			v = Violation.SPAM;
 		}
 		if (maxNums > 0) {
-			int charCount = 0;
-			for (char c : message.replace(" ", "").toCharArray()) {
-				if (Character.isDigit(c)) {
-					charCount++;
-				}
-			}
-			if (charCount > maxNums)
+			int numCount = message.replaceAll("[^0-9]", "").length();
+			ChatGuardPlugin.debug(1, "Numerics count: " + numCount);
+			if (numCount > maxNums)
 				v = Violation.SPAM;
 		}
 		if (v != null && informAdmins) {
