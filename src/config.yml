@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------------- #
 
 # dont touch this
-Version: 1
+Version: 2
 
 Check for updates: true
 
@@ -60,7 +60,10 @@ Warnings settings:
     # works only if separate is false
     max count: 10
 Punishment settings:
+    # execute commands from commands section if player gains max warning count
     enabled: true
+    # max mute time for native /cg mute command(set to 0 for unlimited). Time format - 1s, 1m, 1h, 1d
+    max mute time: 1h
     # you can add any reason with any name how many as you want(but for what?)
     reasons: 
         1: '{Player} kicked because he is bad boy'

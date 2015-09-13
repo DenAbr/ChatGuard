@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -56,7 +57,7 @@ public class Utils {
 		String word = message.substring(wordStart, wordEnd);
 		return word.trim();
 	}
-	
+
 	public static boolean isInt(String string) {
 		try {
 			Integer.parseInt(string);
@@ -64,5 +65,99 @@ public class Utils {
 		} catch (Exception e) {
 		}
 		return false;
+	}
+
+	public static long parseTime(String time) {
+		String unit;
+		String number;
+		if (time.length() > 1) {
+			unit = time.substring(time.length() - 1).toLowerCase();
+			number = time.substring(0, time.length() - 1);
+		} else {
+			unit = "s";
+			number = time;
+		}
+
+		if (!isInt(number)) {
+			return Long.MIN_VALUE;
+		}
+
+		int ch = Integer.parseInt(number);
+		long result = Long.MIN_VALUE;
+
+		switch (unit) {
+		case "s":
+			result = TimeUnit.SECONDS.toMillis(ch);
+			break;
+		case "m":
+			result = TimeUnit.MINUTES.toMillis(ch);
+			break;
+		case "h":
+			result = TimeUnit.HOURS.toMillis(ch);
+			break;
+		case "d":
+			result = TimeUnit.DAYS.toMillis(ch);
+			break;
+		default:
+			result = TimeUnit.SECONDS.toMillis(isInt(time) ? Integer.parseInt(time) : ch);
+			break;
+		}
+		return result;
+	}
+
+	public static String translateTime(String time) {
+		String unit;
+		String number;
+		if (time.length() > 1) {
+			unit = time.substring(time.length() - 1).toLowerCase();
+			number = time.substring(0, time.length() - 1);
+		} else {
+			unit = "s";
+			number = time;
+		}
+		int ch = Integer.parseInt(number);
+		return translateByLastDigit(ch, unit);
+	}
+
+	public static String translateByLastDigit(int ch, String unit2) {
+		String unit;
+		switch (unit2) {
+		case "s":
+			unit = "sec.";
+			break;
+		case "m":
+			unit = "min.";
+			break;
+		case "h":
+			unit = "hr.";
+			break;
+		case "d":
+			unit = "days";
+			break;
+		default:
+			unit = "ms.";
+			break;
+		}
+		return ch + " " + unit;
+	}
+
+	public static String getTimeInMaxUnit(long time) {
+		int ch = 0;
+		if (TimeUnit.MILLISECONDS.toDays(time) > 0) {
+			ch = (int) TimeUnit.MILLISECONDS.toDays(time);
+			return translateByLastDigit(ch, "d");
+		} else if (TimeUnit.MILLISECONDS.toHours(time) > 0) {
+			ch = (int) TimeUnit.MILLISECONDS.toHours(time);
+			return translateByLastDigit(ch, "h");
+		} else if (TimeUnit.MILLISECONDS.toMinutes(time) > 0) {
+			ch = (int) TimeUnit.MILLISECONDS.toMinutes(time);
+			return translateByLastDigit(ch, "m");
+		} else if (TimeUnit.MILLISECONDS.toSeconds(time) > 0) {
+			ch = (int) TimeUnit.MILLISECONDS.toSeconds(time);
+			return translateByLastDigit(ch, "m");
+		} else {
+			ch = (int) time;
+			return ch + "ms.";
+		}
 	}
 }

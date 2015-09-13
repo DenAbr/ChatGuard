@@ -93,8 +93,7 @@ public class SwearFilter extends AbstractFilter {
 				if (oldFileSwear.exists()) {
 					String oldLine = Files.readFirstLine(oldFileSwear, Charset.forName("UTF-8")).replace('|', '\n');
 					Files.write(oldLine.getBytes(Charset.forName("UTF-8")), newFileSwear);
-					new File(ChatGuardPlugin.getInstance().getDataFolder(),
-							"old").mkdirs();
+					new File(ChatGuardPlugin.getInstance().getDataFolder(), "old").mkdirs();
 					Files.move(oldFileSwear, new File(ChatGuardPlugin.getInstance().getDataFolder(),
 							"old" + File.separator + "swearlist.txt"));
 					ChatGuardPlugin.getLog().info("Moved old swearlist file");
@@ -124,6 +123,8 @@ public class SwearFilter extends AbstractFilter {
 
 	public static void addWord(String w) {
 		Pattern p = Pattern.compile(w);
+		if (swearPattern.pattern().contains(p.pattern()))
+			return;
 		swearPattern = Pattern.compile(swearPattern.pattern() + "|" + p.pattern());
 		File swearFile = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
 		try {

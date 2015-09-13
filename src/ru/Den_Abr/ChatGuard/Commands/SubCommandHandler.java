@@ -43,8 +43,8 @@ public class SubCommandHandler {
 		for (Violation v : Violation.values()) {
 			if (v == Violation.BLACKCHAR)
 				continue;
-			cs.sendMessage(Message.valueOf(v.toString().toUpperCase()).get()
-					+ ": " + ChatColor.GRAY + player.getViolationCount(v, true));
+			cs.sendMessage(Message.valueOf(v.toString().toUpperCase()).get() + ": " + ChatColor.GRAY
+					+ player.getViolationCount(v, true));
 		}
 	}
 
@@ -73,8 +73,7 @@ public class SubCommandHandler {
 			}
 			return;
 		}
-		if (cs.hasPermission("chatguard.clearchat.all")
-				&& args[0].equalsIgnoreCase("ALL")) {
+		if (cs.hasPermission("chatguard.clearchat.all") && args[0].equalsIgnoreCase("ALL")) {
 			for (Player p : Utils.getOnlinePlayers()) {
 				Utils.clearChat(p);
 			}
@@ -98,8 +97,18 @@ public class SubCommandHandler {
 		// ya
 		PlayerListener.globalMute = !PlayerListener.globalMute;
 
-		Bukkit.broadcastMessage(PlayerListener.globalMute ? Message.GLOBAL_MUTE_ENABLED
-				.get() : Message.GLOBAL_MUTE_DISABLED.get());
+		Bukkit.broadcastMessage(
+				PlayerListener.globalMute ? Message.GLOBAL_MUTE_ENABLED.get() : Message.GLOBAL_MUTE_DISABLED.get());
+	}
+
+	@Cmd(desc = "Mute player for some reason", name = "mute", perm = "chatguard.mute", args = "[Player] (Reason) (Time)", min = 1, max = 3)
+	public void mute(CommandSender cs, String[] args) {
+		
+	}
+
+	@Cmd(desc = "Unmute muted player", name = "unmute", perm = "chatguard.unmute", args = "[Player]", min = 1, max = 1)
+	public void unMute(CommandSender cs, String[] args) {
+		
 	}
 
 	@Cmd(desc = "Clear some warnings", name = "clear", perm = "chatguard.clearwarnings", args = "(Type) (Player)", max = 2)
@@ -113,8 +122,7 @@ public class SubCommandHandler {
 						continue;
 					sb.append(allV).append(" ");// looks fine
 				}
-				cs.sendMessage(ChatColor.GOLD + "Available types: "
-						+ ChatColor.GREEN + sb.toString().trim());
+				cs.sendMessage(ChatColor.GOLD + "Available types: " + ChatColor.GREEN + sb.toString().trim());
 				return;
 			}
 			if (args.length == 1) {
@@ -130,7 +138,7 @@ public class SubCommandHandler {
 		} else
 			CGPlayer.clearAllWarnings(null, false);
 		cs.sendMessage(Message.SUCCESSFULLY.get());
-		
+
 	}
 
 	@Cmd(desc = "Warn [Player]", name = "warn", perm = "chatguard.warn", args = "[Player] [Type]", min = 2, max = 2)
@@ -149,8 +157,7 @@ public class SubCommandHandler {
 					continue;
 				sb.append(allV).append(" ");// looks fine
 			}
-			cs.sendMessage(ChatColor.GOLD + "Available types: "
-					+ ChatColor.GREEN + sb.toString().trim());
+			cs.sendMessage(ChatColor.GOLD + "Available types: " + ChatColor.GREEN + sb.toString().trim());
 			return;
 		}
 		CGPlayer cgp = CGPlayer.get(p);
@@ -169,16 +176,9 @@ public class SubCommandHandler {
 
 	@Cmd(desc = "Show this page", name = "help", perm = "")
 	public void help(CommandSender cs, String[] args) {
-		cs.sendMessage(ChatColor.GOLD
-				+ ChatGuardPlugin.getInstance().getDescription().getName()
-				+ " v"
-				+ ChatColor.GREEN
-				+ ChatGuardPlugin.getInstance().getDescription().getVersion()
-				+ ChatColor.GOLD
-				+ " by "
-				+ ChatColor.DARK_PURPLE
-				+ ChatGuardPlugin.getInstance().getDescription().getAuthors()
-						.get(0));
+		cs.sendMessage(ChatColor.GOLD + ChatGuardPlugin.getInstance().getDescription().getName() + " v"
+				+ ChatColor.GREEN + ChatGuardPlugin.getInstance().getDescription().getVersion() + ChatColor.GOLD
+				+ " by " + ChatColor.DARK_PURPLE + ChatGuardPlugin.getInstance().getDescription().getAuthors().get(0));
 		for (SubCommand sc : CommandManager.instance.subComs.getCommands()) {
 			sc.printHelp(cs, "chatguard");
 		}

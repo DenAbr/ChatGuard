@@ -10,12 +10,13 @@ import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.google.common.io.Files;
+
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
-import com.google.common.io.Files;
-
 public class Settings {
+	private static final int CONFIG_VERSION = 2;
 	private static YamlConfiguration config;
 
 	private static boolean checkUpdates;
@@ -31,6 +32,8 @@ public class Settings {
 	private static int debugLevel;
 	private static int cooldown;
 
+	private static long maxMuteTime;
+	
 	private static String replacement;
 
 	private static Map<String, Integer> commands = new HashMap<>();
@@ -45,22 +48,22 @@ public class Settings {
 		if (!config.isSet("Version")) {
 			try {
 				new File(pl.getDataFolder(), "old").mkdirs();
-				Files.move(fconfig, new File(
-						new File(pl.getDataFolder(), "old"), "old_config.yml"));
+				Files.move(fconfig, new File(new File(pl.getDataFolder(), "old"), "old_config.yml"));
 				Files.move(new File(pl.getDataFolder(), "warnings.yml"),
-						new File(new File(pl.getDataFolder(), "old"),
-								"warnings.yml"));
+						new File(new File(pl.getDataFolder(), "old"), "warnings.yml"));
 				Files.move(new File(pl.getDataFolder(), "messages.yml"),
-						new File(new File(pl.getDataFolder(), "old"),
-								"messages.yml"));
-				ChatGuardPlugin.getLog().info(
-						"Old configuration was moved to old dirrectory");
+						new File(new File(pl.getDataFolder(), "old"), "messages.yml"));
+				ChatGuardPlugin.getLog().info("Old configuration was moved to old dirrectory");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			fconfig.delete();
 			pl.saveResource("config.yml", false);
 			config = YamlConfiguration.loadConfiguration(fconfig);
+		}
+
+		if (config.getInt("Version") != CONFIG_VERSION) {
+			migrateFrom(config.getInt("Version"));
 		}
 
 		checkUpdates = config.getBoolean("Check for updates");
@@ -72,6 +75,8 @@ public class Settings {
 		punishmentsEnabled = config.getBoolean("Punishment settings.enabled");
 		signsEnabled = config.getBoolean("Other settings.check signs");
 
+		maxMuteTime = Utils.parseTime(config.getString("Punishment settings.max mute time"));
+		
 		replacement = config.getString("Messages.replacement");
 
 		maxWarnings = config.getInt("Warnings settings.max count");
@@ -79,23 +84,16 @@ public class Settings {
 		cooldown = config.getInt("flood settings.message cooldown");
 
 		commands.clear();
-		for (String command : config
-				.getStringList("Other settings.check commands")) {
+		for (String command : config.getStringList("Other settings.check commands")) {
 			String[] cmd = command.split(Pattern.quote(":"));
-			if (cmd.length != 2 || !Utils.isInt(cmd[1])
-					|| Integer.parseInt(cmd[1]) < 0)
+			if (cmd.length != 2 || !Utils.isInt(cmd[1]) || Integer.parseInt(cmd[1]) < 0)
 				continue;
 			commands.put(cmd[0].toLowerCase(), Integer.parseInt(cmd[1]));
 		}
 		reasons.clear();
-		for (String key : config.getConfigurationSection(
-				"Punishment settings.reasons").getKeys(false)) {
-			reasons.put(
-					key,
-					ChatColor.translateAlternateColorCodes(
-							'&',
-							config.getString("Punishment settings.reasons."
-									+ key)));
+		for (String key : config.getConfigurationSection("Punishment settings.reasons").getKeys(false)) {
+			reasons.put(key, ChatColor.translateAlternateColorCodes('&',
+					config.getString("Punishment settings.reasons." + key)));
 		}
 
 		if (debugLevel != 0) {
@@ -113,6 +111,14 @@ public class Settings {
 
 	public static YamlConfiguration getConfig() {
 		return config;
+	}
+
+	public static void saveConfig() {
+		try {
+			getConfig().save(new File(ChatGuardPlugin.getInstance().getDataFolder(), "config.yml"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static boolean isSeparatedWarnings() {
@@ -162,8 +168,7 @@ public class Settings {
 	public static List<String> getPunishCommands(String sec) {
 		if (!config.getBoolean("Punishment settings.commands.custom"))
 			sec = "common";
-		return config.getStringList("Punishment settings.commands." + sec
-				+ " commands");
+		return config.getStringList("Punishment settings.commands." + sec + " commands");
 	}
 
 	public static Map<String, String> getPunishReasons() {
@@ -181,6 +186,15 @@ public class Settings {
 	public static boolean isSignsEnabled() {
 		return signsEnabled;
 	}
-
 	
+	public static long getMaxMuteTime() {
+		return maxMuteTime;
+	}
+
+	private static void migrateFrom(int v) {
+		if (v == 1) {
+			getConfig().set("Punishment settings.max mute time", "1h");
+		}
+		saveConfig();
+	}
 }

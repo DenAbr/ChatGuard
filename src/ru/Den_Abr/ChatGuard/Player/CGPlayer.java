@@ -24,6 +24,7 @@ public abstract class CGPlayer {
 	private FixedSizeList<String> lastMessages = new FixedSizeList<>(1);
 	private List<Violation> violations = new ArrayList<>();
 	protected long lastMessage = -1L;
+	protected long muteTime = -1L;
 
 	public abstract boolean hasPermission(String perm);
 
@@ -47,6 +48,23 @@ public abstract class CGPlayer {
 
 	public List<Violation> getViolations() {
 		return violations;
+	}
+
+	public boolean isMuted() {
+		if (muteTime < 0)
+			return false;
+		if (muteTime > System.currentTimeMillis())
+			return true;
+		muteTime = -1;
+		return false;
+	}
+
+	public void mute(long time) {
+		muteTime = System.currentTimeMillis() + time;
+	}
+
+	public void unMute() {
+		muteTime = -1;
 	}
 
 	@Override
@@ -74,7 +92,7 @@ public abstract class CGPlayer {
 		if (null == p)
 			return null;
 		CGPlayer temp = new LegacyChatPlayer(p);
-		if (cache.contains(new LegacyChatPlayer(p))) {
+		if (cache.contains(temp)) {
 			CGPlayer player = cache.get(cache.indexOf(temp));
 			player.updatePlayer(p);
 			return player;
@@ -110,8 +128,7 @@ public abstract class CGPlayer {
 		violations.add(v);
 		int violCount = getViolationCount(v, false);
 		warn(v, violCount, maxWarn);
-		if (violCount >= maxWarn && Settings.isPunishmentsEnabled()
-				&& Settings.isWarnsEnabled()) {
+		if (violCount >= maxWarn && Settings.isPunishmentsEnabled() && Settings.isWarnsEnabled()) {
 			punish(v);
 			clearWarnings(v, Settings.isSeparatedWarnings());
 		}
@@ -130,12 +147,9 @@ public abstract class CGPlayer {
 	}
 
 	public void punish(Violation v) {
-		for (String command : Settings.getPunishCommands(v
-				.getPunishmentSection())) {
-			for (Entry<String, String> reasonEntry : Settings
-					.getPunishReasons().entrySet()) {
-				command = command.replace("{Reason_" + reasonEntry.getKey()
-						+ "}", reasonEntry.getValue());
+		for (String command : Settings.getPunishCommands(v.getPunishmentSection())) {
+			for (Entry<String, String> reasonEntry : Settings.getPunishReasons().entrySet()) {
+				command = command.replace("{Reason_" + reasonEntry.getKey() + "}", reasonEntry.getValue());
 			}
 			command = command.replace("{Player}", getName());
 			final StringBuilder sb = new StringBuilder(command);
@@ -143,8 +157,7 @@ public abstract class CGPlayer {
 				// chat events is async and we need to sync command execution
 				@Override
 				public void run() {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-							sb.toString());
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), sb.toString());
 				}
 			}.runTask(ChatGuardPlugin.getInstance());
 
@@ -152,28 +165,23 @@ public abstract class CGPlayer {
 	}
 
 	public void warn(Violation v, Integer violCount, Integer max) {
-		String warnFormat = Message.WARN_FORMAT.get()
-				.replace("{MAX}", max.toString())
-				.replace("{CURRENT}", violCount.toString());
+		String warnFormat = Message.WARN_FORMAT.get().replace("{MAX}", max.toString()).replace("{CURRENT}",
+				violCount.toString());
 		if (!Settings.isWarnsEnabled())
 			warnFormat = "";
 		// *_*
 		switch (v) {
 		case SWEAR:
-			getPlayer().sendMessage(
-					Message.SWEARING.get().replace("{WARNS}", warnFormat));
+			getPlayer().sendMessage(Message.SWEARING.get().replace("{WARNS}", warnFormat));
 			break;
 		case CAPS:
-			getPlayer().sendMessage(
-					Message.CAPSING.get().replace("{WARNS}", warnFormat));
+			getPlayer().sendMessage(Message.CAPSING.get().replace("{WARNS}", warnFormat));
 			break;
 		case SPAM:
-			getPlayer().sendMessage(
-					Message.SPAMMING.get().replace("{WARNS}", warnFormat));
+			getPlayer().sendMessage(Message.SPAMMING.get().replace("{WARNS}", warnFormat));
 			break;
 		case FLOOD:
-			getPlayer().sendMessage(
-					Message.FLOODING.get().replace("{WARNS}", warnFormat));
+			getPlayer().sendMessage(Message.FLOODING.get().replace("{WARNS}", warnFormat));
 			break;
 		default:
 			ChatGuardPlugin.debug(0, "Magic Violation type " + v);
