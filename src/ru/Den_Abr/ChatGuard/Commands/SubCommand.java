@@ -47,6 +47,8 @@ public class SubCommand {
 	}
 
 	public boolean isPermitted(CommandSender cs) {
+		if (perm.isEmpty())
+			return true;
 		return cs.hasPermission(perm);
 	}
 

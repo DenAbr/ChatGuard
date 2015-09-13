@@ -15,6 +15,7 @@ import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Utils.FixedSizeList;
+import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 import com.google.common.base.Objects;
 
@@ -25,6 +26,7 @@ public abstract class CGPlayer {
 	private List<Violation> violations = new ArrayList<>();
 	protected long lastMessage = -1L;
 	protected long muteTime = -1L;
+	private String muteReason;
 
 	public abstract boolean hasPermission(String perm);
 
@@ -59,12 +61,24 @@ public abstract class CGPlayer {
 		return false;
 	}
 
-	public void mute(long time) {
+	public String getMuteReason() {
+		return muteReason;
+	}
+
+	public void mute(long time, String reason) {
 		muteTime = System.currentTimeMillis() + time;
+		muteReason = reason;
+		getPlayer().sendMessage(
+				Message.UR_MUTED.get().replace("{REASON}", reason).replace("{TIME}", Utils.getTimeInMaxUnit(time)));
 	}
 
 	public void unMute() {
 		muteTime = -1;
+		muteReason = null;
+	}
+
+	public long getMuteTime() {
+		return muteTime;
 	}
 
 	@Override

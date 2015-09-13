@@ -1,5 +1,7 @@
 package ru.Den_Abr.ChatGuard.ChatFilters;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,22 +37,30 @@ public class SpamFilter extends AbstractFilter {
 		Matcher ipMatcher = ipPattern.matcher(checkMessage);
 		Matcher domMatcher = domainPattern.matcher(checkMessage);
 		Violation v = null;
+		List<String> matches = new ArrayList<>();
 		while (ipMatcher.find()) {
-			if (Whitelist.isWhitelisted(ipMatcher.group()))
+			String found = ipMatcher.group();
+			if (Whitelist.isWhitelisted(found))
 				continue;
+			matches.add(found);
 			v = Violation.SPAM;
 		}
 		while (domMatcher.find()) {
-			if (Whitelist.isWhitelisted(domMatcher.group()))
+			String found = domMatcher.group();
+			if (Whitelist.isWhitelisted(found))
 				continue;
+			matches.add(found);
 			v = Violation.SPAM;
 		}
 		if (maxNums > 0) {
-			int numCount = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', message)).replaceAll("[^0-9]", "").length();
+			int numCount = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', message))
+					.replaceAll("[^0-9]", "").length();
 			ChatGuardPlugin.debug(1, "Numbers count: " + numCount);
 			if (numCount > maxNums)
 				v = Violation.SPAM;
 		}
+		if (Settings.isHardMode())
+			matches.clear();
 		if (v != null && informAdmins) {
 			informAdmins(player, message);
 		}
@@ -58,9 +68,7 @@ public class SpamFilter extends AbstractFilter {
 	}
 
 	private void informAdmins(CGPlayer player, String message) {
-		String complete = Message.INFORM_SPAM.get()
-				.replace("{PLAYER}", player.getName())
-				.replace("{MESSAGE}", message);
+		String complete = Message.INFORM_SPAM.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message);
 		Bukkit.getConsoleSender().sendMessage(complete);
 		Bukkit.broadcast(complete, "chatguard.inform.spam");
 	}
@@ -74,20 +82,16 @@ public class SpamFilter extends AbstractFilter {
 			if (Whitelist.isWhitelisted(group)) {
 				continue;
 			}
-			message = message.replaceAll(
-					group,
-					Settings.isSeparatedWarnings() ? replacement : Settings
-							.getReplacement());
+			message = message.replaceAll(group,
+					Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 		}
 		while (domMatcher.find()) {
 			String group = domMatcher.group();
 			if (Whitelist.isWhitelisted(group)) {
 				continue;
 			}
-			message = message.replaceAll(
-					group,
-					Settings.isSeparatedWarnings() ? replacement : Settings
-							.getReplacement());
+			message = message.replaceAll(group,
+					Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 		}
 		if (maxNums > 0) {
 			StringBuffer sb = new StringBuffer();
@@ -109,34 +113,29 @@ public class SpamFilter extends AbstractFilter {
 
 	@Override
 	public void register() {
-		ConfigurationSection cs = Settings.getConfig().getConfigurationSection(
-				"spam settings");
+		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("spam settings");
 		if (!cs.getBoolean("enabled"))
 			return;
 		informAdmins = cs.getBoolean("inform admins");
 		maxWarns = cs.getInt("max warnings");
 
-		ipPattern = Pattern.compile(cs.getString("ip regexp"),
-				Pattern.CASE_INSENSITIVE);
-		domainPattern = Pattern
-				.compile(
-						cs.getString("domain regexp"),
-						Pattern.CASE_INSENSITIVE);
+		ipPattern = Pattern.compile(cs.getString("ip regexp"), Pattern.CASE_INSENSITIVE);
+		domainPattern = Pattern.compile(cs.getString("domain regexp"), Pattern.CASE_INSENSITIVE);
 
 		maxNums = cs.getInt("max numbers");
-		replacement = ChatColor.translateAlternateColorCodes('&',
-				cs.getString("custom replacement"));
-		
+		replacement = ChatColor.translateAlternateColorCodes('&', cs.getString("custom replacement"));
+
 		addMetricsGraph();
 
 		getActiveFilters().add(this);
 		return;
 	}
+
 	@Override
 	public void addMetricsGraph() {
 		Graph g = ChatGuardPlugin.metrics.getOrCreateGraph("Filters used");
 		g.addPlotter(new Plotter("Spam filter") {
-			
+
 			@Override
 			public int getValue() {
 				return 1;

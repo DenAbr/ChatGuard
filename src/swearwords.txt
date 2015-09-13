@@ -6,5 +6,5 @@ here
 now
 with
 more
-r+e+g+e+x+p
+r.e.g.e.x.p
 support

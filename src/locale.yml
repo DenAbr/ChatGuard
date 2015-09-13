@@ -1,4 +1,4 @@
-version: 1
+version: 2
 
 # messages support color codes
 player not found: '&4Player not found'
@@ -12,6 +12,9 @@ inform spam: '{PLAYER} spaming: {MESSAGE}'
 inform caps: '{PLAYER} capsing: {MESSAGE}'
 wait cooldown: 'You are sending messages too often. Wait {TIME}'
 sec: 'sec.'
+hours: 'hrs.'
+days: 'days'
+minutes: 'min.'
 warn capsing: 'Dude! Turn of capslock!{WARNS}'
 warn flooding: 'Stop flooding!{WARNS}'
 warn swearing: 'Dont swear!{WARNS}'
@@ -23,3 +26,8 @@ swear: 'Swear'
 caps: 'Caps'
 flood: 'Flood'
 spam: 'Spam'
+you are muted: 'You cant send messages because you are muted for {REASON}. Wait {TIME}'
+player muted: 'Player muted for {TIME}. Reason: {REASON}'
+already muted: 'Player is already muted!'
+is not muted: 'Player is not muted!'
+default reason: 'Without reason'

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -40,22 +41,30 @@ public class SwearFilter extends AbstractFilter {
 		}
 		Violation v = null;
 		Matcher swearMatcher = swearPattern.matcher(checkMessage.toLowerCase());
+		List<String> matches = new ArrayList<>();
 		while (swearMatcher.find()) {
 			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
+			ChatGuardPlugin.debug(1, found);
 			if (Whitelist.isWhitelisted(found.toLowerCase()))
 				continue;
+			matches.add(found);
 			v = Violation.SWEAR;
 		}
-
+		if (Settings.isHardMode())
+			matches.clear();
 		if (v != null && informAdmins) {
-			informAdmins(player, message);
+			informAdmins(player, message, matches);
 		}
 		return v;
 	}
 
-	private void informAdmins(CGPlayer player, String message) {
+	private void informAdmins(CGPlayer player, String message, List<String> matches) {
 		String complete = Message.INFORM_SWEAR.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}",
 				message);
+
+		for (String s : matches) {
+			complete = complete.replace(s, ChatColor.UNDERLINE + s + ChatColor.RESET);
+		}
 		Bukkit.getConsoleSender().sendMessage(complete);
 		Bukkit.broadcast(complete, "chatguard.inform.swear");
 	}
@@ -77,6 +86,35 @@ public class SwearFilter extends AbstractFilter {
 		return message;
 	}
 
+	private static void loadWords() throws IOException {
+		File oldFileSwear = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearlist.txt");
+		File newFileSwear = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
+		if (!newFileSwear.exists()) {
+			if (oldFileSwear.exists()) {
+				String oldLine = Files.readFirstLine(oldFileSwear, Charset.forName("UTF-8")).replace('|', '\n');
+				Files.write(oldLine.getBytes(Charset.forName("UTF-8")), newFileSwear);
+				new File(ChatGuardPlugin.getInstance().getDataFolder(), "old").mkdirs();
+				Files.move(oldFileSwear, new File(ChatGuardPlugin.getInstance().getDataFolder(),
+						"old" + File.separator + "swearlist.txt"));
+				ChatGuardPlugin.getLog().info("Moved old swearlist file");
+			} else {
+				ChatGuardPlugin.getInstance().saveResource("swearwords.txt", false);
+				ChatGuardPlugin.getInstance().getLogger().warning("Check your swearwords.txt file!");
+			}
+		}
+		String pat = "";
+		for (String word : new ArrayList<>(Files.readLines(newFileSwear, Charset.forName("UTF-8")))) {
+			if (word.isEmpty())
+				continue;
+			if (pat.isEmpty()) {
+				pat = word;
+			} else {
+				pat += "|" + word;
+			}
+		}
+		swearPattern = Pattern.compile(pat, Pattern.CASE_INSENSITIVE);
+	}
+
 	@Override
 	public void register() {
 		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("swear settings");
@@ -87,37 +125,14 @@ public class SwearFilter extends AbstractFilter {
 		replacement = ChatColor.translateAlternateColorCodes('&', cs.getString("custom replacement"));
 
 		try {
-			File oldFileSwear = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearlist.txt");
-			File newFileSwear = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
-			if (!newFileSwear.exists()) {
-				if (oldFileSwear.exists()) {
-					String oldLine = Files.readFirstLine(oldFileSwear, Charset.forName("UTF-8")).replace('|', '\n');
-					Files.write(oldLine.getBytes(Charset.forName("UTF-8")), newFileSwear);
-					new File(ChatGuardPlugin.getInstance().getDataFolder(), "old").mkdirs();
-					Files.move(oldFileSwear, new File(ChatGuardPlugin.getInstance().getDataFolder(),
-							"old" + File.separator + "swearlist.txt"));
-					ChatGuardPlugin.getLog().info("Moved old swearlist file");
-				} else {
-					ChatGuardPlugin.getInstance().saveResource("swearwords.txt", false);
-					ChatGuardPlugin.getInstance().getLogger().warning("Check your swearwords.txt file!");
-				}
-			}
-			String pat = "";
-			for (String word : new ArrayList<>(Files.readLines(newFileSwear, Charset.forName("UTF-8")))) {
-				if (word.isEmpty())
-					continue;
-				if (pat.isEmpty()) {
-					pat = word;
-				} else {
-					pat += "|" + word;
-				}
-			}
-			swearPattern = Pattern.compile(pat, Pattern.CASE_INSENSITIVE);
-			addMetricsGraph();
-			getActiveFilters().add(this);
-		} catch (Exception e) {
+			loadWords();
+		} catch (IOException e) {
 			e.printStackTrace();
+			return;
 		}
+
+		addMetricsGraph();
+		getActiveFilters().add(this);
 		return;
 	}
 
@@ -125,10 +140,30 @@ public class SwearFilter extends AbstractFilter {
 		Pattern p = Pattern.compile(w);
 		if (swearPattern.pattern().contains(p.pattern()))
 			return;
-		swearPattern = Pattern.compile(swearPattern.pattern() + "|" + p.pattern());
 		File swearFile = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
 		try {
 			Files.append("\n" + w, swearFile, StandardCharsets.UTF_8);
+			loadWords();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void removeWord(String w) {
+		Pattern p = Pattern.compile(w);
+		if (!swearPattern.pattern().contains(p.pattern()))
+			return;
+		File swearFile = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
+		try {
+			List<String> temp = new ArrayList<>();
+			for (String line : Files.readLines(swearFile, StandardCharsets.UTF_8)) {
+				if (!line.equalsIgnoreCase(w)) {
+					temp.add(line);
+				}
+			}
+			String toWrite = StringUtils.join(temp, "\n");
+			Files.write(toWrite.getBytes(StandardCharsets.UTF_8), swearFile);
+			loadWords();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -145,4 +180,5 @@ public class SwearFilter extends AbstractFilter {
 			}
 		});
 	}
+
 }

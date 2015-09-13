@@ -1,5 +1,8 @@
 package ru.Den_Abr.ChatGuard.Commands;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -49,9 +52,16 @@ public class SubCommandHandler {
 	}
 
 	@Cmd(desc = "Add new banned [WORD]", name = "ban", perm = "chatguard.banword", args = "[WORD]", min = 1)
-	public void add(CommandSender cs, String[] args) {
-		String word = args[0].toLowerCase();
+	public void ban(CommandSender cs, String[] args) {
+		String word = StringUtils.join(args, ' ').toLowerCase().trim();
 		SwearFilter.addWord(word);
+		cs.sendMessage(Message.SUCCESSFULLY.get());
+	}
+
+	@Cmd(desc = "Remove banned [WORD]", name = "unban", perm = "chatguard.unbanword", args = "[WORD]", min = 1)
+	public void unban(CommandSender cs, String[] args) {
+		String word = StringUtils.join(args, ' ').toLowerCase().trim();
+		SwearFilter.removeWord(word);
 		cs.sendMessage(Message.SUCCESSFULLY.get());
 	}
 
@@ -101,14 +111,49 @@ public class SubCommandHandler {
 				PlayerListener.globalMute ? Message.GLOBAL_MUTE_ENABLED.get() : Message.GLOBAL_MUTE_DISABLED.get());
 	}
 
-	@Cmd(desc = "Mute player for some reason", name = "mute", perm = "chatguard.mute", args = "[Player] (Reason) (Time)", min = 1, max = 3)
+	@Cmd(desc = "Mute player for some reason", name = "mute", perm = "chatguard.mute", args = "[Player] ([Time] (Reason))", min = 1, max = 3)
 	public void mute(CommandSender cs, String[] args) {
-		
+		Player pl = Bukkit.getPlayer(args[0]);
+		if (pl == null) {
+			cs.sendMessage(Message.PLAYER_NOT_FOUND.get());
+			return;
+		}
+		CGPlayer cp = CGPlayer.get(pl);
+		if (cp.isMuted()) {
+			cs.sendMessage(Message.ALREADY_MUTED.get());
+			return;
+		}
+		long time = Settings.getMaxMuteTime();
+		if (args.length > 1) {
+			long parsed = Utils.parseTime(args[1]);
+			if (parsed > 0 && parsed <= Settings.getMaxMuteTime())
+				time = parsed;
+		}
+		String reason = Message.DEFAULT_REASON.get();
+		if (args.length > 2) {
+			reason = ChatColor
+					.translateAlternateColorCodes('&', StringUtils.join(Arrays.copyOfRange(args, 2, args.length), ' '))
+					.trim();
+		}
+		cp.mute(time, reason);
+		cs.sendMessage(
+				Message.PLAYER_MUTED.get().replace("{REASON}", reason).replace("{TIME}", Utils.getTimeInMaxUnit(time)));
 	}
 
 	@Cmd(desc = "Unmute muted player", name = "unmute", perm = "chatguard.unmute", args = "[Player]", min = 1, max = 1)
 	public void unMute(CommandSender cs, String[] args) {
-		
+		Player pl = Bukkit.getPlayer(args[0]);
+		if (pl == null) {
+			cs.sendMessage(Message.PLAYER_NOT_FOUND.get());
+			return;
+		}
+		CGPlayer cp = CGPlayer.get(pl);
+		if (!cp.isMuted()) {
+			cs.sendMessage(Message.IS_NOT_MUTED.get());
+			return;
+		}
+		cp.unMute();
+		cs.sendMessage(Message.SUCCESSFULLY.get());
 	}
 
 	@Cmd(desc = "Clear some warnings", name = "clear", perm = "chatguard.clearwarnings", args = "(Type) (Player)", max = 2)
@@ -180,7 +225,8 @@ public class SubCommandHandler {
 				+ ChatColor.GREEN + ChatGuardPlugin.getInstance().getDescription().getVersion() + ChatColor.GOLD
 				+ " by " + ChatColor.DARK_PURPLE + ChatGuardPlugin.getInstance().getDescription().getAuthors().get(0));
 		for (SubCommand sc : CommandManager.instance.subComs.getCommands()) {
-			sc.printHelp(cs, "chatguard");
+			if (sc.isPermitted(cs))
+				sc.printHelp(cs, "chatguard");
 		}
 	}
 

@@ -3,6 +3,7 @@ package ru.Den_Abr.ChatGuard.Listeners;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -16,6 +17,7 @@ import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
+import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class PlayerListener implements Listener {
 	private static PlayerListener instance;
@@ -30,9 +32,17 @@ public class PlayerListener implements Listener {
 		if (AbstractIntegration.shouldSkip(e.getPlayer()))
 			return;
 		CGPlayer player = CGPlayer.get(e.getPlayer());
+
 		if (globalMute && !player.hasPermission("chatguard.ignore.globalmute")) {
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(Message.GLOBAL_MUTE.get());
+			return;
+		}
+
+		if (player.isMuted()) {
+			e.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason())
+					.replace("{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
+			e.setCancelled(true);
 			return;
 		}
 
@@ -71,14 +81,15 @@ public class PlayerListener implements Listener {
 		ChatGuardPlugin.debug(2, Settings.getCheckCommands());
 		if (!Settings.getCheckCommands().containsKey(comand))
 			return;
+
 		String[] words = e.getMessage().split(" ");
 		int offset = Settings.getCheckCommands().get(comand) + 1;
 
 		String skipped = "";
 		if (offset > 1) {
-			skipped = String.join(" ", Arrays.copyOfRange(words, 1, offset)) + " ";
+			skipped = StringUtils.join(Arrays.copyOfRange(words, 1, offset), ' ') + " ";
 		}
-		String message = String.join(" ", Arrays.copyOfRange(words, offset, words.length));
+		String message = StringUtils.join(Arrays.copyOfRange(words, offset, words.length), ' ');
 		ChatGuardPlugin.debug(2, message);
 		ChatGuardPlugin.debug(2, skipped);
 
@@ -88,6 +99,14 @@ public class PlayerListener implements Listener {
 			return;
 
 		CGPlayer player = CGPlayer.get(e.getPlayer());
+
+		if (player.isMuted()) {
+			e.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason())
+					.replace("{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
+			e.setCancelled(true);
+			return;
+		}
+
 		MessageInfo info = AbstractFilter.handleMessage(message, player);
 		e.setMessage(comand + info.getClearMessage());
 

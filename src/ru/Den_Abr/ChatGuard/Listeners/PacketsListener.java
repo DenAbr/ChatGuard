@@ -2,6 +2,7 @@ package ru.Den_Abr.ChatGuard.Listeners;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
@@ -17,6 +18,7 @@ import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
+import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class PacketsListener {
 
@@ -74,10 +76,10 @@ public class PacketsListener {
 				String[] words = message.split(" ");
 				int offset = Settings.getCheckCommands().get(comand) + 1;
 				String skipped = "";
-				if(offset > 1) {
-					skipped = String.join(" ", Arrays.copyOfRange(words, 1, offset)) + " ";
+				if (offset > 1) {
+					skipped = StringUtils.join(Arrays.copyOfRange(words, 1, offset), ' ') + " ";
 				}
-				message = String.join(" ", Arrays.copyOfRange(words, offset, words.length));
+				message = StringUtils.join(Arrays.copyOfRange(words, offset, words.length), ' ');
 				ChatGuardPlugin.debug(2, message);
 				ChatGuardPlugin.debug(2, skipped);
 
@@ -85,6 +87,15 @@ public class PacketsListener {
 			}
 			if (message.isEmpty())
 				return;
+			
+
+			if (player.isMuted()) {
+				e.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason())
+						.replace("{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
+				e.setCancelled(true);
+				return;
+			}
+			
 			MessageInfo info = AbstractFilter.handleMessage(message, player);
 
 			packet.getStrings().write(0, comand + info.getClearMessage());

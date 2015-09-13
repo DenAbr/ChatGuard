@@ -33,7 +33,7 @@ public class Settings {
 	private static int cooldown;
 
 	private static long maxMuteTime;
-	
+
 	private static String replacement;
 
 	private static Map<String, Integer> commands = new HashMap<>();
@@ -76,7 +76,7 @@ public class Settings {
 		signsEnabled = config.getBoolean("Other settings.check signs");
 
 		maxMuteTime = Utils.parseTime(config.getString("Punishment settings.max mute time"));
-		
+
 		replacement = config.getString("Messages.replacement");
 
 		maxWarnings = config.getInt("Warnings settings.max count");
@@ -186,7 +186,7 @@ public class Settings {
 	public static boolean isSignsEnabled() {
 		return signsEnabled;
 	}
-	
+
 	public static long getMaxMuteTime() {
 		return maxMuteTime;
 	}
@@ -194,6 +194,8 @@ public class Settings {
 	private static void migrateFrom(int v) {
 		if (v == 1) {
 			getConfig().set("Punishment settings.max mute time", "1h");
+			getConfig().set("Version", 2);
+			v = 2;
 		}
 		saveConfig();
 	}

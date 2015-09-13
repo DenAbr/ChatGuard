@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
+
 public class Utils {
 
 	public static void clearChat(Player p) {
@@ -123,16 +125,16 @@ public class Utils {
 		String unit;
 		switch (unit2) {
 		case "s":
-			unit = "sec.";
+			unit = Message.SEC.get();
 			break;
 		case "m":
-			unit = "min.";
+			unit = Message.MINUTES.get();
 			break;
 		case "h":
-			unit = "hr.";
+			unit = Message.HOURS.get();
 			break;
 		case "d":
-			unit = "days";
+			unit = Message.DAYS.get();
 			break;
 		default:
 			unit = "ms.";
@@ -154,7 +156,7 @@ public class Utils {
 			return translateByLastDigit(ch, "m");
 		} else if (TimeUnit.MILLISECONDS.toSeconds(time) > 0) {
 			ch = (int) TimeUnit.MILLISECONDS.toSeconds(time);
-			return translateByLastDigit(ch, "m");
+			return translateByLastDigit(ch, "s");
 		} else {
 			ch = (int) time;
 			return ch + "ms.";

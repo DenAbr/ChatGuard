@@ -1,6 +1,7 @@
 package ru.Den_Abr.ChatGuard.Configuration;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -8,6 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 
 public class Messages {
+	private static final int VERSION = 2;
 
 	public enum Message {
 		PLAYER_NOT_FOUND("player not found"), INFORM_CAPS("inform caps"), INFORM_SPAM("inform spam"), INFORM_SWEAR(
@@ -15,7 +17,17 @@ public class Messages {
 						"no permissions"), GLOBAL_MUTE_ENABLED("global mute enabled"), GLOBAL_MUTE_DISABLED(
 								"global mute disabled"), INFORM_FLOOD("inform flood"), SWEARING(
 										"warn swearing"), FLOODING("warn flooding"), SPAMMING("warn spamming"), CAPSING(
-												"warn capsing"), WARN_FORMAT("warn format"), SUCCESSFULLY("successfully"), SWEAR("swear"), SPAM("spam"), FLOOD("flood"), CAPS("caps");
+												"warn capsing"), WARN_FORMAT("warn format"), SUCCESSFULLY(
+														"successfully"), SWEAR("swear"), SPAM("spam"), FLOOD(
+																"flood"), CAPS("caps"), ALREADY_MUTED(
+																		"already muted"), DEFAULT_REASON(
+																				"default reason"), UR_MUTED(
+																						"you are muted"), PLAYER_MUTED(
+																								"player muted"), MINUTES(
+																										"minutes"), HOURS(
+																												"hours"), DAYS(
+																														"days"), IS_NOT_MUTED(
+																																"is not muted");
 
 		private String key;
 
@@ -26,6 +38,11 @@ public class Messages {
 		public String get() {
 			return ChatColor.translateAlternateColorCodes('&',
 					confMes.getString(key, "*** UNKNOWN MESSAGE " + key + " ***"));
+		}
+
+		@Override
+		public String toString() {
+			return get();
 		}
 	}
 
@@ -38,5 +55,33 @@ public class Messages {
 			pl.saveResource("locale.yml", false);
 		}
 		confMes = YamlConfiguration.loadConfiguration(fileMes);
+		if (confMes.getInt("version") != VERSION) {
+			migrateFrom(confMes.getInt("version"));
+		}
+	}
+
+	private static void migrateFrom(int v) {
+		if (v == 1) {
+			confMes.set("hours", "hrs.");
+			confMes.set("days", "days");
+			confMes.set("minutes", "mins.");
+			confMes.set("you are muted", "You cant send messages because you are muted for {REASON}. Wait {TIME}");
+			confMes.set("player muted", "Player muted for {TIME}. Reason: {REASON}");
+			confMes.set("already muted", "Player is already muted!");
+			confMes.set("default reason", "Without reason");
+			confMes.set("version", 2);
+			confMes.set("is not muted", "Player is not muted");
+			v = 2;
+		}
+
+		save();
+	}
+
+	public static void save() {
+		try {
+			confMes.save(fileMes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
