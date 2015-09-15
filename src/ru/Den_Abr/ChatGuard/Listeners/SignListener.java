@@ -20,7 +20,9 @@ public class SignListener implements Listener {
 		CGPlayer player = CGPlayer.get(e.getPlayer());
 		for (int i = 0; i < e.getLines().length; i++) {
 			String line = e.getLine(i);
-			MessageInfo info = AbstractFilter.handleMessage(line, player);
+			if (line.isEmpty())
+				continue;
+			MessageInfo info = AbstractFilter.handleMessage(line, player, true);
 			e.setLine(i, info.getClearMessage());
 
 			if (!info.getViolations().isEmpty()) {

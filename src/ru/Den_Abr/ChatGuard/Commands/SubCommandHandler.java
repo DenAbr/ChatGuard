@@ -54,20 +54,25 @@ public class SubCommandHandler {
 	@Cmd(desc = "Add new banned [WORD]", name = "ban", perm = "chatguard.banword", args = "[WORD]", min = 1)
 	public void ban(CommandSender cs, String[] args) {
 		String word = StringUtils.join(args, ' ').toLowerCase().trim();
-		SwearFilter.addWord(word);
-		cs.sendMessage(Message.SUCCESSFULLY.get());
+
+		if (SwearFilter.addWord(word))
+			cs.sendMessage(Message.SUCCESSFULLY.get());
+		else
+			cs.sendMessage(word + " is already banned");
 	}
 
 	@Cmd(desc = "Remove banned [WORD]", name = "unban", perm = "chatguard.unbanword", args = "[WORD]", min = 1)
 	public void unban(CommandSender cs, String[] args) {
 		String word = StringUtils.join(args, ' ').toLowerCase().trim();
-		SwearFilter.removeWord(word);
-		cs.sendMessage(Message.SUCCESSFULLY.get());
+		if (SwearFilter.removeWord(word))
+			cs.sendMessage(Message.SUCCESSFULLY.get());
+		else
+			cs.sendMessage(ChatColor.RED + word + " is not banned");
 	}
 
 	@Cmd(desc = "Do not mark [WORD] as advertising or swearing", name = "whitelist", perm = "chatguard.whitelistadd", args = "[WORD]", min = 1)
 	public void whitelist(CommandSender cs, String[] args) {
-		String word = args[0].toLowerCase();
+		String word = StringUtils.join(args, ' ').toLowerCase().trim();
 		Whitelist.add(word);
 		cs.sendMessage(Message.SUCCESSFULLY.get());
 	}
@@ -216,6 +221,7 @@ public class SubCommandHandler {
 		Messages.load(ChatGuardPlugin.getInstance());
 		Whitelist.load(ChatGuardPlugin.getInstance());
 		ChatGuardPlugin.getInstance().registerFilters();
+		
 		cs.sendMessage(ChatColor.GRAY + "Reload complete.");
 	}
 

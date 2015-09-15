@@ -56,7 +56,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 
-		MessageInfo info = AbstractFilter.handleMessage(e.getMessage(), player);
+		MessageInfo info = AbstractFilter.handleMessage(e.getMessage(), player, false);
 		e.setMessage(info.getClearMessage());
 
 		if (!info.getViolations().isEmpty()) {
@@ -107,7 +107,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		MessageInfo info = AbstractFilter.handleMessage(message, player);
+		MessageInfo info = AbstractFilter.handleMessage(message, player, false);
 		e.setMessage(comand + info.getClearMessage());
 
 		if (!info.getViolations().isEmpty()) {

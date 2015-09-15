@@ -25,12 +25,14 @@ public abstract class AbstractFilter implements Filter {
 		}
 	}
 
-	public static MessageInfo handleMessage(String mes, CGPlayer player) {
+	public static MessageInfo handleMessage(String mes, CGPlayer player, boolean isSign) {
 		MessageInfo info = new MessageInfo();
 		info.setPlayer(player);
 		info.setOriginalMessage(mes);
 		info.setClearMessage(mes);
 		for (Filter f : getActiveFilters()) {
+			if(isSign && f.getClass() == FloodFilter.class)
+				continue;
 			Violation v = f.checkMessage(mes, player);
 			if (v != null) {
 				info.setClearMessage(f.getClearMessage(mes, player));

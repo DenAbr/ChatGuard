@@ -96,7 +96,7 @@ public class PacketsListener {
 				return;
 			}
 			
-			MessageInfo info = AbstractFilter.handleMessage(message, player);
+			MessageInfo info = AbstractFilter.handleMessage(message, player, false);
 
 			packet.getStrings().write(0, comand + info.getClearMessage());
 			e.setPacket(packet);

@@ -136,10 +136,10 @@ public class SwearFilter extends AbstractFilter {
 		return;
 	}
 
-	public static void addWord(String w) {
+	public static boolean addWord(String w) {
 		Pattern p = Pattern.compile(w);
 		if (swearPattern.pattern().contains(p.pattern()))
-			return;
+			return false;
 		File swearFile = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
 		try {
 			Files.append("\n" + w, swearFile, StandardCharsets.UTF_8);
@@ -147,12 +147,13 @@ public class SwearFilter extends AbstractFilter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return true;
 	}
 
-	public static void removeWord(String w) {
+	public static boolean removeWord(String w) {
 		Pattern p = Pattern.compile(w);
 		if (!swearPattern.pattern().contains(p.pattern()))
-			return;
+			return false;
 		File swearFile = new File(ChatGuardPlugin.getInstance().getDataFolder(), "swearwords.txt");
 		try {
 			List<String> temp = new ArrayList<>();
@@ -167,6 +168,7 @@ public class SwearFilter extends AbstractFilter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return true;
 	}
 
 	@Override
