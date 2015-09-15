@@ -62,13 +62,16 @@ public class SpamFilter extends AbstractFilter {
 		if (Settings.isHardMode())
 			matches.clear();
 		if (v != null && informAdmins) {
-			informAdmins(player, message);
+			informAdmins(player, message, matches);
 		}
 		return v;
 	}
 
-	private void informAdmins(CGPlayer player, String message) {
+	private void informAdmins(CGPlayer player, String message, List<String> matches) {
 		String complete = Message.INFORM_SPAM.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message);
+		for (String s : matches) {
+			complete = complete.replaceFirst(s, ChatColor.UNDERLINE + s + ChatColor.RESET);
+		}
 		Bukkit.getConsoleSender().sendMessage(complete);
 		Bukkit.broadcast(complete, "chatguard.inform.spam");
 	}
@@ -82,7 +85,7 @@ public class SpamFilter extends AbstractFilter {
 			if (Whitelist.isWhitelisted(group)) {
 				continue;
 			}
-			message = message.replaceAll(group,
+			message = message.replace(group,
 					Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 		}
 		while (domMatcher.find()) {
@@ -90,7 +93,7 @@ public class SpamFilter extends AbstractFilter {
 			if (Whitelist.isWhitelisted(group)) {
 				continue;
 			}
-			message = message.replaceAll(group,
+			message = message.replace(group,
 					Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 		}
 		if (maxNums > 0) {

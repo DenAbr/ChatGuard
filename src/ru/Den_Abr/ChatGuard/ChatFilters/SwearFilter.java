@@ -44,7 +44,7 @@ public class SwearFilter extends AbstractFilter {
 		List<String> matches = new ArrayList<>();
 		while (swearMatcher.find()) {
 			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
-			ChatGuardPlugin.debug(1, found);
+			ChatGuardPlugin.debug(1, getClass().getSimpleName() + " found: " + found);
 			if (Whitelist.isWhitelisted(found.toLowerCase()))
 				continue;
 			matches.add(found);
@@ -63,7 +63,7 @@ public class SwearFilter extends AbstractFilter {
 				message);
 
 		for (String s : matches) {
-			complete = complete.replace(s, ChatColor.UNDERLINE + s + ChatColor.RESET);
+			complete = complete.replaceFirst(s, ChatColor.UNDERLINE + s + ChatColor.RESET);
 		}
 		Bukkit.getConsoleSender().sendMessage(complete);
 		Bukkit.broadcast(complete, "chatguard.inform.swear");
@@ -81,7 +81,7 @@ public class SwearFilter extends AbstractFilter {
 			toReplace.add(found);
 		}
 		for (String s : toReplace)
-			message = message.replace(s, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
+			message = message.replaceFirst(s, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 
 		return message;
 	}
