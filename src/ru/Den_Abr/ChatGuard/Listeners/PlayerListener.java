@@ -47,46 +47,47 @@ public class PlayerListener implements Listener {
 		e.setMessage(info.getClearMessage());
 	}
 
-	public static MessageInfo handleMessage(String message, CGPlayer e) {
-		if (AbstractIntegration.shouldSkip(e.getPlayer()))
+	public static MessageInfo handleMessage(String message, CGPlayer player) {
+		if (AbstractIntegration.shouldSkip(player.getPlayer()))
 			return null;
 		MessageInfo info = new MessageInfo();
-		if (globalMute && !e.hasPermission("chatguard.ignore.globalmute")) {
+		if (globalMute && !player.hasPermission("chatguard.ignore.globalmute")) {
 			info.cancel(true);
-			e.getPlayer().sendMessage(Message.GLOBAL_MUTE.get());
+			player.getPlayer().sendMessage(Message.GLOBAL_MUTE.get());
 			return info;
 		}
 
-		if (e.isMuted()) {
-			e.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", e.getMuteReason()).replace("{TIME}",
-					Utils.getTimeInMaxUnit(e.getMuteTime() - System.currentTimeMillis())));
+		if (player.isMuted()) {
+			player.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason())
+					.replace("{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
 			info.cancel(true);
 			return info;
 		}
 
-		if (!e.hasPermission("chatguard.ignore.cooldown")) {
-			int cdtime = isCooldownOver(e);
-			ChatGuardPlugin.debug(1, e.getName() + "'s CD " + cdtime);
+		if (!player.hasPermission("chatguard.ignore.cooldown")) {
+			int cdtime = isCooldownOver(player);
+			ChatGuardPlugin.debug(1, player.getName() + "'s CD " + cdtime);
 			if (cdtime > 0) {
 				info.cancel(true);
-				e.getPlayer().sendMessage(Message.WAIT_COOLDOWN.get().replace("{TIME}", cdtime + Message.SEC.get()));
+				player.getPlayer()
+						.sendMessage(Message.WAIT_COOLDOWN.get().replace("{TIME}", cdtime + Message.SEC.get()));
 				return info;
 			}
 		}
 
-		info = AbstractFilter.handleMessage(message, e, false);
+		info = AbstractFilter.handleMessage(message, player, false);
 
 		if (!info.getViolations().isEmpty()) {
 			if (Settings.isCancellingEnabled()) {
 				info.cancel(true);
 			} else {
-				e.setLastMessageTime(System.currentTimeMillis());
-				e.getLastMessages().add(message);
+				player.setLastMessageTime(System.currentTimeMillis());
+				player.getLastMessages().add(message);
 			}
 			return info;
 		}
-		e.setLastMessageTime(System.currentTimeMillis());
-		e.getLastMessages().add(message);
+		player.setLastMessageTime(System.currentTimeMillis());
+		player.getLastMessages().add(message);
 		return info;
 	}
 
@@ -94,8 +95,7 @@ public class PlayerListener implements Listener {
 		if (AbstractIntegration.shouldSkip(player.getPlayer()) || Settings.getCheckCommands().isEmpty())
 			return null;
 		String comand = message.split(" ")[0].toLowerCase();
-		ChatGuardPlugin.debug(2, "Command: " + comand);
-		ChatGuardPlugin.debug(2, "Commands list: " + Settings.getCheckCommands());
+		ChatGuardPlugin.debug(2, "Command: " + comand, "Commands list: " + Settings.getCheckCommands());
 		if (!Settings.getCheckCommands().containsKey(comand))
 			return null;
 
@@ -106,19 +106,18 @@ public class PlayerListener implements Listener {
 		if (offset > 1) {
 			skipped = StringUtils.join(Arrays.copyOfRange(words, 1, offset), ' ') + " ";
 		}
-		String fixedMessage = "";
+		String cutMessage = "";
 		if (offset <= words.length) {
-			fixedMessage = StringUtils.join(Arrays.copyOfRange(words, offset, words.length), ' ');
+			cutMessage = StringUtils.join(Arrays.copyOfRange(words, offset, words.length), ' ');
 		} else {
-			ChatGuardPlugin.debug(0,
+			ChatGuardPlugin.debug(1,
 					"Something wrong with '" + message + "'. Offset: " + offset + ", array lenght: " + words.length);
 		}
-		ChatGuardPlugin.debug(2, "Fixed part: " + fixedMessage);
-		ChatGuardPlugin.debug(2, "Skipped part: " + skipped);
+		ChatGuardPlugin.debug(2, "Fixed part: " + cutMessage, "Skipped part: " + skipped);
 
 		comand += " " + skipped;
 
-		if (fixedMessage.isEmpty())
+		if (cutMessage.isEmpty())
 			return null;
 
 		if (player.isMuted()) {
@@ -129,7 +128,7 @@ public class PlayerListener implements Listener {
 			return info;
 		}
 
-		MessageInfo info = AbstractFilter.handleMessage(fixedMessage, player, false);
+		MessageInfo info = AbstractFilter.handleMessage(cutMessage, player, false);
 		info.setClearMessage(comand + info.getClearMessage());
 
 		if (!info.getViolations().isEmpty()) {
