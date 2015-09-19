@@ -35,6 +35,7 @@ public class SwearFilter extends AbstractFilter {
 	public Violation checkMessage(String message, CGPlayer player) {
 		if (player.hasPermission("chatguard.ignore.swear"))
 			return null;
+		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": Hello!");
 		String checkMessage = message;
 		if (Settings.isHardMode()) {
 			checkMessage = checkMessage.replaceAll(" ", "").replaceAll("[^A-Za-zА-Яа-яà-ÿÀ-ß]", "");
@@ -43,10 +44,14 @@ public class SwearFilter extends AbstractFilter {
 		Matcher swearMatcher = swearPattern.matcher(checkMessage.toLowerCase());
 		List<String> matches = new ArrayList<>();
 		while (swearMatcher.find()) {
-			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
-			ChatGuardPlugin.debug(1, getClass().getSimpleName() + " found: " + found);
-			if (Whitelist.isWhitelisted(found.toLowerCase()))
+			if (swearMatcher.group().trim().isEmpty())
 				continue;
+			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
+			ChatGuardPlugin.debug(1, getClass().getSimpleName() + " found: " + swearMatcher.group());
+			if (Whitelist.isWhitelisted(found.toLowerCase())) {
+				ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": " + found + " is whitelisted");
+				continue;
+			}
 			matches.add(found);
 			v = Violation.SWEAR;
 		}
@@ -60,10 +65,10 @@ public class SwearFilter extends AbstractFilter {
 
 	private void informAdmins(CGPlayer player, String message, List<String> matches) {
 		String complete = Message.INFORM_SWEAR.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}",
-				message);
+				ChatColor.stripColor(message));
 
 		for (String s : matches) {
-			complete = complete.replaceFirst(s, ChatColor.UNDERLINE + s + ChatColor.RESET);
+			complete = complete.replaceFirst(s,ChatColor.UNDERLINE + s + ChatColor.RESET);
 		}
 		Bukkit.getConsoleSender().sendMessage(complete);
 		Bukkit.broadcast(complete, "chatguard.inform.swear");
@@ -74,6 +79,8 @@ public class SwearFilter extends AbstractFilter {
 		Matcher swearMatcher = swearPattern.matcher(message.toLowerCase());
 		List<String> toReplace = new ArrayList<>();
 		while (swearMatcher.find()) {
+			if (swearMatcher.group().trim().isEmpty())
+				continue;
 			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
 			if (Whitelist.isWhitelisted(found.toLowerCase()))
 				continue;
@@ -81,7 +88,8 @@ public class SwearFilter extends AbstractFilter {
 			toReplace.add(found);
 		}
 		for (String s : toReplace)
-			message = message.replaceFirst(s, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
+			message = message.replaceFirst(s,
+					Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 
 		return message;
 	}

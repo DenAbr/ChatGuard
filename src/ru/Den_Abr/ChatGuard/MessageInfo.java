@@ -11,6 +11,7 @@ public class MessageInfo {
 	private String clearMessage;
 	private CGPlayer player;
 	private List<Violation> violations = new ArrayList<>();
+	private boolean cancel = false;
 
 	public String getOriginalMessage() {
 		return originalMessage;
@@ -38,5 +39,13 @@ public class MessageInfo {
 
 	public List<Violation> getViolations() {
 		return violations;
+	}
+
+	public void cancel(boolean arg) {
+		cancel = arg;
+	}
+
+	public boolean isCancelled() {
+		return cancel;
 	}
 }

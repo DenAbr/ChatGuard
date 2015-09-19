@@ -23,6 +23,7 @@ public class FloodFilter extends AbstractFilter {
 		Violation v = null;
 		if (player.hasPermission("chatguard.ignore.flood"))
 			return v;
+		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": Hello!");
 
 		// player object just created
 		if (player.getLastMessages().getFixedSize() != levels) {

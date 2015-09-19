@@ -22,6 +22,8 @@ public class CapsFilter extends AbstractFilter {
 			return null;
 		if (player.hasPermission("chatguard.ignore.caps"))
 			return null;
+		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": Hello!");
+
 		String ws = message.replaceAll(" ", "").replaceAll("[^A-Za-zА-Яа-яà-ÿÀ-ß]", "");
 		if (ws.length() == 0 || ws.length() < minLenght)
 			return null;

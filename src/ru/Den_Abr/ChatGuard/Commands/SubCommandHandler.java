@@ -58,7 +58,7 @@ public class SubCommandHandler {
 		if (SwearFilter.addWord(word))
 			cs.sendMessage(Message.SUCCESSFULLY.get());
 		else
-			cs.sendMessage(word + " is already banned");
+			cs.sendMessage(ChatColor.RED + word + " is already banned");
 	}
 
 	@Cmd(desc = "Remove banned [WORD]", name = "unban", perm = "chatguard.unbanword", args = "[WORD]", min = 1)
@@ -90,7 +90,8 @@ public class SubCommandHandler {
 		}
 		if (cs.hasPermission("chatguard.clearchat.all") && args[0].equalsIgnoreCase("ALL")) {
 			for (Player p : Utils.getOnlinePlayers()) {
-				Utils.clearChat(p);
+				if (!p.hasPermission("chatguard.ignore.cc"))
+					Utils.clearChat(p);
 			}
 			return;
 		}
@@ -221,7 +222,7 @@ public class SubCommandHandler {
 		Messages.load(ChatGuardPlugin.getInstance());
 		Whitelist.load(ChatGuardPlugin.getInstance());
 		ChatGuardPlugin.getInstance().registerFilters();
-		
+
 		cs.sendMessage(ChatColor.GRAY + "Reload complete.");
 	}
 

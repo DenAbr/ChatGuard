@@ -65,7 +65,7 @@ public class Settings {
 		if (config.getInt("Version") != CONFIG_VERSION) {
 			migrateFrom(config.getInt("Version"));
 		}
-
+		
 		checkUpdates = config.getBoolean("Check for updates");
 		usePackets = config.getBoolean("Other settings.use packets");
 		separateWarnings = config.getBoolean("Warnings settings.separate");
@@ -96,7 +96,7 @@ public class Settings {
 					config.getString("Punishment settings.reasons." + key)));
 		}
 
-		if (debugLevel != 0) {
+		if (debugLevel > 0) {
 			ChatGuardPlugin.debug(1, "Debug level: " + getDebugLevel());
 		}
 	}
@@ -195,6 +195,7 @@ public class Settings {
 		if (v == 1) {
 			getConfig().set("Punishment settings.max mute time", "1h");
 			getConfig().set("Version", 2);
+			
 			v = 2;
 		}
 		saveConfig();

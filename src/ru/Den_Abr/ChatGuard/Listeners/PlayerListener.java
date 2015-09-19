@@ -29,98 +29,121 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
-		if (AbstractIntegration.shouldSkip(e.getPlayer()))
+		MessageInfo info = handleMessage(e.getMessage(), CGPlayer.get(e.getPlayer()));
+		if (info == null)
 			return;
-		CGPlayer player = CGPlayer.get(e.getPlayer());
-
-		if (globalMute && !player.hasPermission("chatguard.ignore.globalmute")) {
+		if (info.isCancelled())
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(Message.GLOBAL_MUTE.get());
-			return;
-		}
-
-		if (player.isMuted()) {
-			e.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason())
-					.replace("{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
-			e.setCancelled(true);
-			return;
-		}
-
-		if (!player.hasPermission("chatguard.ignore.cooldown")) {
-			int cdtime = isCooldownOver(player);
-			ChatGuardPlugin.debug(1, player.getName() + " CD " + cdtime);
-			if (cdtime > 0) {
-				e.setCancelled(true);
-				e.getPlayer().sendMessage(Message.WAIT_COOLDOWN.get().replace("{TIME}", cdtime + Message.SEC.get()));
-				return;
-			}
-		}
-
-		MessageInfo info = AbstractFilter.handleMessage(e.getMessage(), player, false);
 		e.setMessage(info.getClearMessage());
-
-		if (!info.getViolations().isEmpty()) {
-			if (Settings.isCancellingEnabled()) {
-				e.setCancelled(true);
-			} else {
-				player.setLastMessageTime(System.currentTimeMillis());
-				player.getLastMessages().add(e.getMessage());
-			}
-			return;
-		}
-		player.setLastMessageTime(System.currentTimeMillis());
-		player.getLastMessages().add(e.getMessage());
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerCommand(PlayerCommandPreprocessEvent e) {
-		if (AbstractIntegration.shouldSkip(e.getPlayer()) || Settings.getCheckCommands().isEmpty())
+		MessageInfo info = handleCommand(e.getMessage(), CGPlayer.get(e.getPlayer()));
+		if (info == null)
 			return;
-		String comand = e.getMessage().split(" ")[0].toLowerCase();
-		ChatGuardPlugin.debug(2, comand);
-		ChatGuardPlugin.debug(2, Settings.getCheckCommands());
-		if (!Settings.getCheckCommands().containsKey(comand))
-			return;
+		if (info.isCancelled())
+			e.setCancelled(true);
+		e.setMessage(info.getClearMessage());
+	}
 
-		String[] words = e.getMessage().split(" ");
+	public static MessageInfo handleMessage(String message, CGPlayer e) {
+		if (AbstractIntegration.shouldSkip(e.getPlayer()))
+			return null;
+		MessageInfo info = new MessageInfo();
+		if (globalMute && !e.hasPermission("chatguard.ignore.globalmute")) {
+			info.cancel(true);
+			e.getPlayer().sendMessage(Message.GLOBAL_MUTE.get());
+			return info;
+		}
+
+		if (e.isMuted()) {
+			e.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", e.getMuteReason()).replace("{TIME}",
+					Utils.getTimeInMaxUnit(e.getMuteTime() - System.currentTimeMillis())));
+			info.cancel(true);
+			return info;
+		}
+
+		if (!e.hasPermission("chatguard.ignore.cooldown")) {
+			int cdtime = isCooldownOver(e);
+			ChatGuardPlugin.debug(1, e.getName() + "'s CD " + cdtime);
+			if (cdtime > 0) {
+				info.cancel(true);
+				e.getPlayer().sendMessage(Message.WAIT_COOLDOWN.get().replace("{TIME}", cdtime + Message.SEC.get()));
+				return info;
+			}
+		}
+
+		info = AbstractFilter.handleMessage(message, e, false);
+
+		if (!info.getViolations().isEmpty()) {
+			if (Settings.isCancellingEnabled()) {
+				info.cancel(true);
+			} else {
+				e.setLastMessageTime(System.currentTimeMillis());
+				e.getLastMessages().add(message);
+			}
+			return info;
+		}
+		e.setLastMessageTime(System.currentTimeMillis());
+		e.getLastMessages().add(message);
+		return info;
+	}
+
+	public static MessageInfo handleCommand(String message, CGPlayer player) {
+		if (AbstractIntegration.shouldSkip(player.getPlayer()) || Settings.getCheckCommands().isEmpty())
+			return null;
+		String comand = message.split(" ")[0].toLowerCase();
+		ChatGuardPlugin.debug(2, "Command: " + comand);
+		ChatGuardPlugin.debug(2, "Commands list: " + Settings.getCheckCommands());
+		if (!Settings.getCheckCommands().containsKey(comand))
+			return null;
+
+		String[] words = message.split(" ");
 		int offset = Settings.getCheckCommands().get(comand) + 1;
 
 		String skipped = "";
 		if (offset > 1) {
 			skipped = StringUtils.join(Arrays.copyOfRange(words, 1, offset), ' ') + " ";
 		}
-		String message = StringUtils.join(Arrays.copyOfRange(words, offset, words.length), ' ');
-		ChatGuardPlugin.debug(2, message);
-		ChatGuardPlugin.debug(2, skipped);
+		String fixedMessage = "";
+		if (offset <= words.length) {
+			fixedMessage = StringUtils.join(Arrays.copyOfRange(words, offset, words.length), ' ');
+		} else {
+			ChatGuardPlugin.debug(0,
+					"Something wrong with '" + message + "'. Offset: " + offset + ", array lenght: " + words.length);
+		}
+		ChatGuardPlugin.debug(2, "Fixed part: " + fixedMessage);
+		ChatGuardPlugin.debug(2, "Skipped part: " + skipped);
 
 		comand += " " + skipped;
 
-		if (message.isEmpty())
-			return;
-
-		CGPlayer player = CGPlayer.get(e.getPlayer());
+		if (fixedMessage.isEmpty())
+			return null;
 
 		if (player.isMuted()) {
-			e.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason())
+			player.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason())
 					.replace("{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
-			e.setCancelled(true);
-			return;
+			MessageInfo info = new MessageInfo();
+			info.cancel(true);
+			return info;
 		}
 
-		MessageInfo info = AbstractFilter.handleMessage(message, player, false);
-		e.setMessage(comand + info.getClearMessage());
+		MessageInfo info = AbstractFilter.handleMessage(fixedMessage, player, false);
+		info.setClearMessage(comand + info.getClearMessage());
 
 		if (!info.getViolations().isEmpty()) {
 			if (Settings.isCancellingEnabled()) {
-				e.setCancelled(true);
+				info.cancel(true);
 			} else {
 				player.setLastMessageTime(System.currentTimeMillis());
-				player.getLastMessages().add(e.getMessage());
+				player.getLastMessages().add(message);
 			}
-			return;
+			return info;
 		}
 		player.setLastMessageTime(System.currentTimeMillis());
-		player.getLastMessages().add(e.getMessage());
+		player.getLastMessages().add(message);
+		return info;
 	}
 
 	public static int isCooldownOver(CGPlayer pl) {

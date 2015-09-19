@@ -42,7 +42,6 @@ public class Whitelist {
 	}
 
 	public static boolean isWhitelisted(String found) {
-		ChatGuardPlugin.debug(2, found);
 		for (Pattern p : whitelisted) {
 			if (p.matcher(found).find())
 				return true;

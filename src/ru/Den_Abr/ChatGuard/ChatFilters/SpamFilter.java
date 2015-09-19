@@ -30,6 +30,7 @@ public class SpamFilter extends AbstractFilter {
 	public Violation checkMessage(String message, CGPlayer player) {
 		if (player.hasPermission("chatguard.ignore.spam"))
 			return null;
+		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": Hello!");
 		String checkMessage = message;
 		if (Settings.isHardMode()) {
 			checkMessage = checkMessage.replace(" ", "");
@@ -68,7 +69,7 @@ public class SpamFilter extends AbstractFilter {
 	}
 
 	private void informAdmins(CGPlayer player, String message, List<String> matches) {
-		String complete = Message.INFORM_SPAM.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message);
+		String complete = Message.INFORM_SPAM.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", ChatColor.stripColor(message));
 		for (String s : matches) {
 			complete = complete.replaceFirst(s, ChatColor.UNDERLINE + s + ChatColor.RESET);
 		}

@@ -1,8 +1,5 @@
 package ru.Den_Abr.ChatGuard.Listeners;
 
-import java.util.Arrays;
-
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
@@ -13,12 +10,8 @@ import com.comphenix.protocol.events.PacketEvent;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.MessageInfo;
-import ru.Den_Abr.ChatGuard.ChatFilters.AbstractFilter;
-import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
-import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
-import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class PacketsListener {
 
@@ -45,73 +38,19 @@ public class PacketsListener {
 			if (AbstractIntegration.shouldSkip(e.getPlayer()))
 				return;
 			PacketContainer packet = e.getPacket();
-			CGPlayer player = CGPlayer.get(e.getPlayer());
 			String message = packet.getStrings().read(0);
-			String comand = "";
+			MessageInfo info = null;
 			if (!message.startsWith("/")) {
-				if (PlayerListener.globalMute && !player.hasPermission("chatguard.ignore.globalmute")) {
-					e.setCancelled(true);
-					e.getPlayer().sendMessage(Message.GLOBAL_MUTE.get());
-					return;
-				}
-
-				if (!player.hasPermission("chatguard.ignore.cooldown")) {
-					int cdtime = PlayerListener.isCooldownOver(player);
-					ChatGuardPlugin.debug(1, player.getName() + " CD " + cdtime);
-					if (cdtime > 0) {
-						e.setCancelled(true);
-						e.getPlayer()
-								.sendMessage(Message.WAIT_COOLDOWN.get().replace("{TIME}", cdtime + Message.SEC.get()));
-						return;
-					}
-				}
+				info = PlayerListener.handleMessage(message, CGPlayer.get(e.getPlayer()));
 			} else {
-				if (Settings.getCheckCommands().isEmpty())
-					return;
-				comand = message.split(" ")[0].toLowerCase();
-				ChatGuardPlugin.debug(2, comand);
-				ChatGuardPlugin.debug(2, Settings.getCheckCommands());
-				if (!Settings.getCheckCommands().containsKey(comand))
-					return;
-				String[] words = message.split(" ");
-				int offset = Settings.getCheckCommands().get(comand) + 1;
-				String skipped = "";
-				if (offset > 1) {
-					skipped = StringUtils.join(Arrays.copyOfRange(words, 1, offset), ' ') + " ";
-				}
-				message = StringUtils.join(Arrays.copyOfRange(words, offset, words.length), ' ');
-				ChatGuardPlugin.debug(2, message);
-				ChatGuardPlugin.debug(2, skipped);
-
-				comand += " " + skipped;
+				info = PlayerListener.handleCommand(message, CGPlayer.get(e.getPlayer()));
 			}
-			if (message.isEmpty())
+			if (info == null)
 				return;
-			
-
-			if (player.isMuted()) {
-				e.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason())
-						.replace("{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
+			if (info.isCancelled())
 				e.setCancelled(true);
-				return;
-			}
-			
-			MessageInfo info = AbstractFilter.handleMessage(message, player, false);
-
-			packet.getStrings().write(0, comand + info.getClearMessage());
+			packet.getStrings().write(0, info.getClearMessage());
 			e.setPacket(packet);
-
-			if (!info.getViolations().isEmpty()) {
-				if (Settings.isCancellingEnabled()) {
-					e.setCancelled(true);
-				} else {
-					player.setLastMessageTime(System.currentTimeMillis());
-					player.getLastMessages().add(message);
-				}
-				return;
-			}
-			player.setLastMessageTime(System.currentTimeMillis());
-			player.getLastMessages().add(message);
 		}
 
 	}
