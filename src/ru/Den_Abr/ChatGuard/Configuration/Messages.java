@@ -9,7 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 
 public class Messages {
-	private static final int VERSION = 2;
+	private static final int VERSION = 3;
 
 	public enum Message {
 		PLAYER_NOT_FOUND("player not found"), INFORM_CAPS("inform caps"), INFORM_SPAM("inform spam"), INFORM_SWEAR(
@@ -27,7 +27,11 @@ public class Messages {
 																										"minutes"), HOURS(
 																												"hours"), DAYS(
 																														"days"), IS_NOT_MUTED(
-																																"is not muted");
+																																"is not muted"), MUTED(
+																																		"muted"), YES(
+																																				"yes"), NO(
+																																						"no"), EXPIRE_TIME(
+																																								"expiration time");
 
 		private String key;
 
@@ -38,11 +42,6 @@ public class Messages {
 		public String get() {
 			return ChatColor.translateAlternateColorCodes('&',
 					confMes.getString(key, "*** UNKNOWN MESSAGE " + key + " ***"));
-		}
-
-		@Override
-		public String toString() {
-			return get();
 		}
 	}
 
@@ -73,7 +72,14 @@ public class Messages {
 			confMes.set("is not muted", "Player is not muted");
 			v = 2;
 		}
-
+		if (v == 2) {
+			confMes.set("muted", "Muted");
+			confMes.set("yes", "&4YES");
+			confMes.set("no", "&3NO");
+			confMes.set("expiration time", "Mute expires");
+			confMes.set("version", 3);
+			v = 3;
+		}
 		save();
 	}
 

@@ -49,6 +49,11 @@ public class SubCommandHandler {
 			cs.sendMessage(Message.valueOf(v.toString().toUpperCase()).get() + ": " + ChatColor.GRAY
 					+ player.getViolationCount(v, true));
 		}
+		cs.sendMessage(Message.MUTED.get() + ": " + (player.isMuted() ? Message.YES : Message.NO));
+		if (player.isMuted()) {
+			cs.sendMessage(Message.EXPIRE_TIME.get() + ": " + ChatColor.RED
+					+ Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis()));
+		}
 	}
 
 	@Cmd(desc = "Add new banned [WORD]", name = "ban", perm = "chatguard.banword", args = "[WORD]", min = 1)

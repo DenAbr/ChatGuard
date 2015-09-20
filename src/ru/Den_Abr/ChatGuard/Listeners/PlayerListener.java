@@ -142,6 +142,7 @@ public class PlayerListener implements Listener {
 		}
 		player.setLastMessageTime(System.currentTimeMillis());
 		player.getLastMessages().add(message);
+		
 		return info;
 	}
 
