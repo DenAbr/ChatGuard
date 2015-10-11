@@ -139,4 +139,6 @@ public class ChatGuardPlugin extends JavaPlugin {
 	public static Logger getLog() {
 		return getInstance().getLogger();
 	}
+	
+	
 }

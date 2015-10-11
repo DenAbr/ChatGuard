@@ -116,6 +116,15 @@ public abstract class CGPlayer {
 		return temp;
 	}
 
+	public static CGPlayer get(String n) {
+		for (CGPlayer cp : cache) {
+			if (cp.getName().equalsIgnoreCase(n)) {
+				return cp;
+			}
+		}
+		return null;
+	}
+
 	public static void clearAllWarnings(Violation v, boolean separate) {
 		for (CGPlayer player : cache) {
 			player.clearWarnings(v, separate);
@@ -149,7 +158,7 @@ public abstract class CGPlayer {
 	}
 
 	public void clearWarnings(Violation v, boolean separatedWarnings) {
-		if (!separatedWarnings) {
+		if (!separatedWarnings || v == null) {
 			violations.clear();
 			return;
 		}
@@ -167,6 +176,7 @@ public abstract class CGPlayer {
 			}
 			command = command.replace("{Player}", getName());
 			final StringBuilder sb = new StringBuilder(command);
+			ChatGuardPlugin.debug(2, "Punish command: " + command);
 			new BukkitRunnable() {
 				// chat events is async and we need to sync command execution
 				@Override

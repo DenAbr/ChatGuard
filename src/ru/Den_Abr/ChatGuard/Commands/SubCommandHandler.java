@@ -171,25 +171,25 @@ public class SubCommandHandler {
 	public void clear(CommandSender cs, String[] args) {
 		if (args.length > 0) {
 			Violation v = Violation.get(args[0].toUpperCase());
-			if (v == null || v == Violation.BLACKCHAR) {
+			if ((v == null || v == Violation.BLACKCHAR) && !args[0].equalsIgnoreCase("ALL")) {
 				StringBuilder sb = new StringBuilder();
 				for (Violation allV : Violation.values()) {
 					if (allV.getPunishmentSection().equals("none"))
 						continue;
 					sb.append(allV).append(" ");// looks fine
 				}
-				cs.sendMessage(ChatColor.GOLD + "Available types: " + ChatColor.GREEN + sb.toString().trim());
+				cs.sendMessage(ChatColor.GOLD + "Available types: " + ChatColor.GREEN + sb.toString() + "ALL");
 				return;
 			}
 			if (args.length == 1) {
 				CGPlayer.clearAllWarnings(v, true);
 			} else if (args.length == 2) {
-				Player p = Bukkit.getPlayer(args[0]);
-				if (p == null || !p.isOnline() /* hello cauldron */) {
+				CGPlayer p = CGPlayer.get(args[1]);
+				if (p == null) {
 					cs.sendMessage(Message.PLAYER_NOT_FOUND.get());
 					return;
 				}
-				CGPlayer.get(p).clearWarnings(v, true);
+				p.clearWarnings(args[0].equalsIgnoreCase("ALL") ? null : v, true);
 			}
 		} else
 			CGPlayer.clearAllWarnings(null, false);

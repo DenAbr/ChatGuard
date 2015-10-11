@@ -16,7 +16,7 @@ import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class Settings {
-	private static final int CONFIG_VERSION = 2;
+	private static final int CONFIG_VERSION = 3;
 	private static YamlConfiguration config;
 
 	private static boolean checkUpdates;
@@ -65,7 +65,7 @@ public class Settings {
 		if (config.getInt("Version") != CONFIG_VERSION) {
 			migrateFrom(config.getInt("Version"));
 		}
-		
+
 		checkUpdates = config.getBoolean("Check for updates");
 		usePackets = config.getBoolean("Other settings.use packets");
 		separateWarnings = config.getBoolean("Warnings settings.separate");
@@ -195,8 +195,13 @@ public class Settings {
 		if (v == 1) {
 			getConfig().set("Punishment settings.max mute time", "1h");
 			getConfig().set("Version", 2);
-			
+
 			v = 2;
+		}
+		if (v == 2) {
+			getConfig().set("flood settings.flood percent", 70);
+			getConfig().set("Version", 3);
+			v = 3;
 		}
 		saveConfig();
 	}
