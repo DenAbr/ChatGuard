@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -95,6 +97,7 @@ public class PlayerListener implements Listener {
 		if (AbstractIntegration.shouldSkip(player.getPlayer()) || Settings.getCheckCommands().isEmpty())
 			return null;
 		String comand = message.split(" ")[0].toLowerCase();
+		comand = Utils.getOriginalCommand(comand);
 		ChatGuardPlugin.debug(2, "Command: " + comand, "Commands list: " + Settings.getCheckCommands());
 		if (!Settings.getCheckCommands().containsKey(comand))
 			return null;
@@ -145,6 +148,8 @@ public class PlayerListener implements Listener {
 		
 		return info;
 	}
+
+
 
 	public static int isCooldownOver(CGPlayer pl) {
 		if (!Settings.isCooldownEnabled()) {

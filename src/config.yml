@@ -38,8 +38,6 @@ flood settings:
     message cooldown: 5
     # 1 value means that the last player's message will be checked for flood only(2 - with penultimate, etc.)
     flood levels: 1
-    # how many percents of message should be similar with previews player's messages for indicating this as flood
-    flood percent: 80
 spam settings:
     enabled: true
     inform admins: true

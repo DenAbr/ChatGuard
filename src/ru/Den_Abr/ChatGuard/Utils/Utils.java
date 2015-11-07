@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
@@ -36,6 +38,18 @@ public class Utils {
 		}
 		return playersOnline;
 
+	}
+
+	public static String getOriginalCommand(String lowerCase) {
+		String[] splitted = lowerCase.split(" ");
+		String first = splitted[0];
+		PluginCommand pc = Bukkit.getPluginCommand(first);
+		if (pc != null) {
+			first = pc.getName();
+			splitted[0] = first;
+			lowerCase = StringUtils.join(splitted, ' ');
+		}
+		return lowerCase;
 	}
 
 	public static String getWord(String message, int start, int end) {
