@@ -10,6 +10,7 @@ public class SubCommandSet {
 	private HashMap<String, SubCommand> subCommands = new HashMap<String, SubCommand>();
 
 	public SubCommandSet() {
+		
 	}
 
 	public void add(SubCommand sc) {

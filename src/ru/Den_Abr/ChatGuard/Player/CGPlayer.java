@@ -15,6 +15,7 @@ import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Utils.FixedSizeList;
+import ru.Den_Abr.ChatGuard.Utils.MessagePair;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 import com.google.common.base.Objects;
@@ -23,6 +24,8 @@ public abstract class CGPlayer {
 	private static List<CGPlayer> cache = new LinkedList<>();
 
 	private FixedSizeList<String> lastMessages = new FixedSizeList<>(1);
+	private FixedSizeList<MessagePair> sentMessages = new FixedSizeList<>(100);
+	private FixedSizeList<String> allMessages = new FixedSizeList<>(100);
 	private List<Violation> violations = new ArrayList<>();
 	protected long lastMessage = -1L;
 	protected long muteTime = -1L;
@@ -124,6 +127,10 @@ public abstract class CGPlayer {
 		}
 		return null;
 	}
+	
+	public static List<CGPlayer> getCache() {
+		return cache;
+	}
 
 	public static void clearAllWarnings(Violation v, boolean separate) {
 		for (CGPlayer player : cache) {
@@ -131,6 +138,14 @@ public abstract class CGPlayer {
 		}
 	}
 
+	public FixedSizeList<MessagePair> getSentMessages() {
+		return sentMessages;
+	}
+	
+	public FixedSizeList<String> getAllMessages() {
+		return allMessages;
+	}
+	
 	public int getViolationCount(Violation v, boolean separately) {
 		if (!Settings.isSeparatedWarnings() && !separately) {
 			return violations.size();
