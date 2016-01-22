@@ -109,7 +109,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 	}
 
 	private boolean setupProtocol() {
-		if (!Settings.useProtocol()) {
+		if (!Settings.usePackets()) {
 			return false;
 		}
 		Plugin plpl = getServer().getPluginManager().getPlugin("ProtocolLib");
@@ -124,7 +124,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		if (Settings.useProtocol())
+		if (Settings.usePackets())
 			PacketsListener.stopListening();
 		getServer().getScheduler().cancelTasks(this);
 	}

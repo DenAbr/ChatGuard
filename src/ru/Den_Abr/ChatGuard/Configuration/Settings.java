@@ -105,7 +105,7 @@ public class Settings {
 		return checkUpdates;
 	}
 
-	public static boolean useProtocol() {
+	public static boolean usePackets() {
 		return usePackets;
 	}
 

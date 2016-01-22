@@ -17,12 +17,12 @@ import ru.Den_Abr.ChatGuard.Utils.SubCommandSet;
 
 public class CommandManager implements CommandExecutor {
 	protected static CommandManager instance;
-	protected static SubCommandHandler handler;
+	protected static BukkitCommandHandler handler;
 	private ChatGuardPlugin plugin;
 	protected SubCommandSet subComs;
 
 	public CommandManager(ChatGuardPlugin pl) {
-		handler = new SubCommandHandler();
+		handler = new BukkitCommandHandler();
 		plugin = pl;
 		registerCommands();
 		instance = this;

@@ -24,7 +24,7 @@ import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 import ru.Den_Abr.ChatGuard.Utils.MessagePair;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
-public class SubCommandHandler {
+public class BukkitCommandHandler {
 
 	@Cmd(desc = "Show your warnings or (Player)'s", name = "info", perm = "chatguard.info", args = "(Player)")
 	public void warnings(CommandSender cs, String[] args) {
@@ -208,6 +208,10 @@ public class SubCommandHandler {
 
 	@Cmd(desc = "Clear messages of specified player", name = "of", perm = "chatguard.clearof", min = 1)
 	public void of(CommandSender cs, String[] args) {
+		if(!Settings.usePackets()) {
+			cs.sendMessage(ChatColor.RED + "Enable 'use packets' settings first.");
+			return;
+		}
 		CGPlayer cp = CGPlayer.get(args[0]);
 		if (cp == null) {
 			cs.sendMessage(Message.PLAYER_NOT_FOUND.get());
