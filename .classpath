@@ -7,6 +7,5 @@
 	<classpathentry kind="lib" path="libs/ProtocolLib-3.6.4.jar"/>
 	<classpathentry kind="lib" path="libs/AuthMe-3.4.jar"/>
 	<classpathentry kind="lib" path="libs/AuthMe-5.0-beta3.jar"/>
-	<classpathentry kind="lib" path="libs/BungeeCord.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
