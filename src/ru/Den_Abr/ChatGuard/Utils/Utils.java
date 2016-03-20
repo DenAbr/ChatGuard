@@ -1,6 +1,9 @@
 package ru.Den_Abr.ChatGuard.Utils;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,13 +14,27 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 
+import com.google.common.io.Files;
+
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 
 public class Utils {
 
 	public static void clearChat(Player p) {
-		for (int i = 0; i < 150; i++) {
+		for (int i = 0; i < 100; i++) {
 			p.sendMessage("");
+		}
+	}
+
+	public static String readLine(File f) {
+		if (!f.exists())
+			return null;
+		
+		try {
+			return StringUtils.join(Files.readLines(f, StandardCharsets.UTF_8), "");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 

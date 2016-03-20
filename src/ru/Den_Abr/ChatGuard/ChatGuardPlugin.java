@@ -21,6 +21,7 @@ import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
 import ru.Den_Abr.ChatGuard.Integration.AuthMe34;
 import ru.Den_Abr.ChatGuard.Integration.AuthMe5;
 import ru.Den_Abr.ChatGuard.Integration.AuthMeLegacy;
+import ru.Den_Abr.ChatGuard.Listeners.ItemListener;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Listeners.SignListener;
@@ -46,6 +47,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 		}
 		Messages.load(this);
 		Whitelist.load(this);
+		ItemListener.scheduleChecks();
 
 		initMetrics();
 		if (!setupProtocol()) {

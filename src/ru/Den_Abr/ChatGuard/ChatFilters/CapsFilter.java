@@ -55,6 +55,8 @@ public class CapsFilter extends AbstractFilter {
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
+		if (player.hasPermission("chatguard.ignore.caps"))
+			return message;
 		return message.toLowerCase();
 	}
 

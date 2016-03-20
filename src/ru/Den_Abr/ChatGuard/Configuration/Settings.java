@@ -2,6 +2,9 @@ package ru.Den_Abr.ChatGuard.Configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +19,7 @@ import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class Settings {
-	private static final int CONFIG_VERSION = 2;
+	private static final int CONFIG_VERSION = 4;
 	private static YamlConfiguration config;
 
 	private static boolean checkUpdates;
@@ -27,6 +30,7 @@ public class Settings {
 	private static boolean warnsEnabled;
 	private static boolean punishmentsEnabled;
 	private static boolean signsEnabled;
+	private static boolean itemsEnabled;
 
 	private static int maxWarnings;
 	private static int debugLevel;
@@ -38,6 +42,7 @@ public class Settings {
 
 	private static Map<String, Integer> commands = new HashMap<>();
 	private static Map<String, String> reasons = new HashMap<>();
+	private static Map<String, String> substitutions = new HashMap<>();
 
 	public static void load(ChatGuardPlugin pl) {
 		File fconfig = new File(pl.getDataFolder(), "config.yml");
@@ -74,6 +79,7 @@ public class Settings {
 		warnsEnabled = config.getBoolean("Warnings settings.enabled");
 		punishmentsEnabled = config.getBoolean("Punishment settings.enabled");
 		signsEnabled = config.getBoolean("Other settings.check signs");
+		itemsEnabled = config.getBoolean("Other settings.check items");
 
 		maxMuteTime = Utils.parseTime(config.getString("Punishment settings.max mute time"));
 
@@ -94,6 +100,13 @@ public class Settings {
 		for (String key : config.getConfigurationSection("Punishment settings.reasons").getKeys(false)) {
 			reasons.put(key, ChatColor.translateAlternateColorCodes('&',
 					config.getString("Punishment settings.reasons." + key)));
+		}
+		substitutions.clear();
+		for (String s : config.getStringList("Substitutions")) {
+			String[] els = s.split(Pattern.quote("|"), 2);
+			if (els.length != 2)
+				continue;
+			substitutions.put(els[0], els[1]);
 		}
 
 		if (debugLevel > 0) {
@@ -191,6 +204,10 @@ public class Settings {
 		return maxMuteTime;
 	}
 
+	public static boolean isItemsEnabled() {
+		return itemsEnabled;
+	}
+
 	private static void migrateFrom(int v) {
 		if (v == 1) {
 			getConfig().set("Punishment settings.max mute time", "1h");
@@ -198,6 +215,32 @@ public class Settings {
 
 			v = 2;
 		}
+		if (v == 2 || v == 3) {
+			getConfig().set("Version", 4);
+			getConfig().set("Other settings.check items", true);
+
+			try {
+				java.nio.file.Files.write(
+						new File(ChatGuardPlugin.getInstance().getDataFolder(), "ipRegexp.txt").toPath(),
+						getConfig().getString("spam settings.ip regexp").getBytes(StandardCharsets.UTF_8),
+						StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+				java.nio.file.Files.write(
+						new File(ChatGuardPlugin.getInstance().getDataFolder(), "domainRegexp.txt").toPath(),
+						getConfig().getString("spam settings.domain regexp").getBytes(StandardCharsets.UTF_8),
+						StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+
+				getConfig().set("spam settings.domain regexp", "now in domainRegexp.txt");
+				getConfig().set("spam settings.ip regexp", "now in ipRegexp.txt");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			getConfig().set("Substitutions", Arrays.asList("1|2", "Red|Green", "@|a"));
+		}
 		saveConfig();
+	}
+
+	public static Map<String, String> getSubstitutions() {
+		return substitutions;
 	}
 }

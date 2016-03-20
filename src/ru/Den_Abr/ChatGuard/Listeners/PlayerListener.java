@@ -1,6 +1,7 @@
 package ru.Den_Abr.ChatGuard.Listeners;
 
 import java.util.Arrays;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,6 +30,8 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
+		e.setMessage(substitude(e.getMessage()));
+
 		MessageInfo info = handleMessage(e.getMessage(), CGPlayer.get(e.getPlayer()));
 		if (info == null)
 			return;
@@ -37,8 +40,19 @@ public class PlayerListener implements Listener {
 		e.setMessage(info.getClearMessage());
 	}
 
+	public static String substitude(String message) {
+		if (message == null)
+			return message;
+		for (Entry<String, String> s : Settings.getSubstitutions().entrySet()) {
+			message = message.replace(s.getKey(), s.getValue());
+		}
+		return message;
+	}
+
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerCommand(PlayerCommandPreprocessEvent e) {
+		e.setMessage(substitude(e.getMessage()));
+
 		MessageInfo info = handleCommand(e.getMessage(), CGPlayer.get(e.getPlayer()));
 		if (info == null)
 			return;

@@ -46,6 +46,11 @@ public class PacketsListener {
 				return;
 			PacketContainer packet = e.getPacket();
 			String message = packet.getStrings().read(0);
+			
+			message = PlayerListener.substitude(message);
+			packet.getStrings().write(0, message);
+			e.setPacket(packet);
+			
 			MessageInfo info = null;
 			CGPlayer cp = CGPlayer.get(e.getPlayer());
 			if (!message.startsWith("/")) {

@@ -76,6 +76,8 @@ public class SwearFilter extends AbstractFilter {
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
+		if (player.hasPermission("chatguard.ignore.swear"))
+			return message;
 		Matcher swearMatcher = swearPattern.matcher(message.toLowerCase());
 		List<String> toReplace = new ArrayList<>();
 		while (swearMatcher.find()) {

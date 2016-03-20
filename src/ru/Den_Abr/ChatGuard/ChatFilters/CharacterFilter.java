@@ -30,6 +30,8 @@ public class CharacterFilter extends AbstractFilter {
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
+		if (player.hasPermission("chatguard.ignore.characters"))
+			return message;
 		for (char c : message.toCharArray()) {
 			if (isNotAllowed(c)) {
 				message = message.replace(Character.valueOf(c).toString(), "");

@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------------- #
 
 # dont touch this
-Version: 3
+Version: 4
 
 Check for updates: true
 
@@ -42,9 +42,6 @@ spam settings:
     enabled: true
     inform admins: true
     max warnings: 10
-    # change only if you know something about regular expressions
-    domain regexp: '([0-9a-z]{2,}\.)+(ru|com|org|ua|su|tv|net|biz|info|name|mobi|kz|by|lv|eu|tk)(:\d*)?'
-    ip regexp: '((?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[.,-:; ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[ ]?[., ][ ]?(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9]))'
     custom replacement: '<spam>'
     # set how many numbers can players send in one message, 0 - disable
     max numbers: 3
@@ -91,8 +88,14 @@ Punishment settings:
         spam commands:
             - kick {Player} {Reason_another}
             - broadcast {Reason_another}
+# replace first element with second element in messages
+Substitutions:
+- '1|l'
+- '0|o'
+- 'green|red'
 Other settings:
     check signs: true
+    check items: true
     # check player's command for swearing, capsing and flooding
     # to disable this set value to []. Number after colon means how many arguements in command we should skip
     check commands: ['/me:0', '/msg:1', '/tell:1', '/w:1', '/r:0']

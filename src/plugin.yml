@@ -1,6 +1,6 @@
 name: ChatGuard
 main: ru.Den_Abr.ChatGuard.ChatGuardPlugin
-version: 7.3
+version: 7.3.1
 author: Den_Abr
 description: Guard for your chat
 softdepend: [ProtocolLib, AuthMe]
