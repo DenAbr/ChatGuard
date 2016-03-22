@@ -29,7 +29,7 @@ public class Utils {
 	public static String readLine(File f) {
 		if (!f.exists())
 			return null;
-		
+
 		try {
 			return StringUtils.join(Files.readLines(f, StandardCharsets.UTF_8), "");
 		} catch (IOException e) {
@@ -55,6 +55,16 @@ public class Utils {
 		}
 		return playersOnline;
 
+	}
+
+	// To prevent regex problems :\
+	public static String replaceFirstSafely(String where, String s, String string) {
+		if (!where.contains(s))
+			return where;
+
+		String ns = where.substring(0, where.indexOf(s)) + string
+				+ where.substring(s.length() + where.indexOf(s), where.length());
+		return ns;
 	}
 
 	public static String getOriginalCommand(String lowerCase) {

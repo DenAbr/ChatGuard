@@ -68,11 +68,13 @@ public class SwearFilter extends AbstractFilter {
 				ChatColor.stripColor(message));
 
 		for (String s : matches) {
-			complete = complete.replaceFirst(s,ChatColor.UNDERLINE + s + ChatColor.RESET);
+
+			complete = Utils.replaceFirstSafely(complete, s, ChatColor.UNDERLINE + s + ChatColor.RESET);
 		}
 		Bukkit.getConsoleSender().sendMessage(complete);
 		Bukkit.broadcast(complete, "chatguard.inform.swear");
 	}
+
 
 	@Override
 	public String getClearMessage(String message, CGPlayer player) {
@@ -90,7 +92,7 @@ public class SwearFilter extends AbstractFilter {
 			toReplace.add(found);
 		}
 		for (String s : toReplace)
-			message = message.replaceFirst(s,
+			message = Utils.replaceFirstSafely(message, s,
 					Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 
 		return message;

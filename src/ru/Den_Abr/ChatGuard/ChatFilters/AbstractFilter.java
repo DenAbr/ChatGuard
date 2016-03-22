@@ -17,15 +17,16 @@ public abstract class AbstractFilter implements Filter {
 		return activeFilters;
 	}
 
-	public static MessageInfo handleMessage(String mes, CGPlayer player, boolean isSign) {
+	public static MessageInfo handleMessage(String mes, CGPlayer player, boolean isChat) {
 		MessageInfo info = new MessageInfo();
 		info.setPlayer(player);
 		info.setOriginalMessage(mes);
 		info.setClearMessage(mes);
 		String copy = info.getOriginalMessage();
 		for (Filter f : getActiveFilters()) {
-			if (isSign && f.getClass() == FloodFilter.class)
+			if (!isChat && f.getClass() == FloodFilter.class)
 				continue;
+			
 			Violation v = f.checkMessage(info.getOriginalMessage(), player);
 			if (v != null) {
 				copy = f.getClearMessage(copy, player);

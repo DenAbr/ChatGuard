@@ -74,7 +74,7 @@ public class SpamFilter extends AbstractFilter {
 		String complete = Message.INFORM_SPAM.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}",
 				ChatColor.stripColor(message));
 		for (String s : matches) {
-			complete = complete.replaceFirst(s, ChatColor.UNDERLINE + s + ChatColor.RESET);
+			complete = Utils.replaceFirstSafely(complete, s, ChatColor.UNDERLINE + s + ChatColor.RESET);
 		}
 		Bukkit.getConsoleSender().sendMessage(complete);
 		Bukkit.broadcast(complete, "chatguard.inform.spam");
@@ -94,11 +94,14 @@ public class SpamFilter extends AbstractFilter {
 			message = message.replace(group, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 		}
 		while (domMatcher.find()) {
-			String group = domMatcher.group();
-			if (Whitelist.isWhitelisted(group)) {
+
+			String found = Utils.getWord(message, domMatcher.start(), domMatcher.end());
+
+			if (Whitelist.isWhitelisted(found)) {
 				continue;
 			}
-			message = message.replace(group, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
+
+			message = message.replace(found, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
 		}
 		if (maxNums > 0) {
 			StringBuffer sb = new StringBuffer();
