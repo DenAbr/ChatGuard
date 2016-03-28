@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------------- #
 
 # dont touch this
-Version: 4
+Version: 5
 
 Check for updates: true
 
@@ -90,8 +90,6 @@ Punishment settings:
             - broadcast {Reason_another}
 # replace first element with second element in messages
 Substitutions:
-- '1|l'
-- '0|o'
 - 'green|red'
 Other settings:
     check signs: true
@@ -103,3 +101,6 @@ Other settings:
     debug level: 0
     # if traditional messages listening system doesnt work(or smth else) plugin can listen packets
     use packets: false
+    # works only if packet listening is disabled
+    # available priorities HIGHEST, HIGH, NORMAL, LOW, LOWEST, MONITOR(not recommended to use)
+    event priority: HIGHEST

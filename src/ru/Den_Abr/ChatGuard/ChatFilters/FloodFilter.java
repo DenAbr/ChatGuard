@@ -23,25 +23,24 @@ public class FloodFilter extends AbstractFilter {
 		Violation v = null;
 		if (player.hasPermission("chatguard.ignore.flood"))
 			return v;
-		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": Hello!");
+		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": " + message);
 
 		// player object just created
 		if (player.getLastMessages().getFixedSize() != levels) {
 			player.getLastMessages().setFixedSize(levels);
 			return v;
 		}
-		if (player.getLastMessages().isEmpty()
-				|| player.getLastMessageTime() == -1
-				|| player.getLastMessageTime()
-						+ TimeUnit.SECONDS.toMillis(floodTime) < System
-							.currentTimeMillis())
+		if (player.getLastMessages().isEmpty() || player.getLastMessageTime() == -1
+				|| player.getLastMessageTime() + TimeUnit.SECONDS.toMillis(floodTime) < System.currentTimeMillis()) {
 			return v;
-
+		}
 		String wws = message.replaceAll("\\s+", " ").toLowerCase();
+		ChatGuardPlugin.debug(2, "Message without whitespaces: " + wws);
+
 		for (String lm : player.getLastMessages()) {
 			lm = lm.replaceAll("\\s+", " ").toLowerCase();
-			if (lm.equalsIgnoreCase(wws)
-					|| (lm.startsWith(wws) && wws.length() - lm.length() < 4)) {
+			ChatGuardPlugin.debug(2, "Last message: " + lm);
+			if (lm.equalsIgnoreCase(wws) || (lm.startsWith(wws) && wws.length() - lm.length() < 4)) {
 				v = Violation.FLOOD;
 			}
 		}
@@ -52,9 +51,8 @@ public class FloodFilter extends AbstractFilter {
 	}
 
 	private void informAdmins(CGPlayer player, String message) {
-		String complete = Message.INFORM_FLOOD.get()
-				.replace("{PLAYER}", player.getName())
-				.replace("{MESSAGE}", message);
+		String complete = Message.INFORM_FLOOD.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}",
+				message);
 		Bukkit.getConsoleSender().sendMessage(complete);
 		Bukkit.broadcast(complete, "chatguard.inform.flood");
 	}
@@ -66,8 +64,7 @@ public class FloodFilter extends AbstractFilter {
 
 	@Override
 	public void register() {
-		ConfigurationSection cs = Settings.getConfig().getConfigurationSection(
-				"flood settings");
+		ConfigurationSection cs = Settings.getConfig().getConfigurationSection("flood settings");
 		if (!cs.getBoolean("enabled"))
 			return;
 		informAdmins = cs.getBoolean("inform admins");

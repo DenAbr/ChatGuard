@@ -46,11 +46,13 @@ public class PacketsListener {
 				return;
 			PacketContainer packet = e.getPacket();
 			String message = packet.getStrings().read(0);
-			
-			message = PlayerListener.substitude(message);
-			packet.getStrings().write(0, message);
-			e.setPacket(packet);
-			
+
+			if (!message.startsWith("/") || PlayerListener.getPMCommand(message) != null) {
+				message = PlayerListener.substitute(message);
+				packet.getStrings().write(0, message);
+				e.setPacket(packet);
+			}
+
 			MessageInfo info = null;
 			CGPlayer cp = CGPlayer.get(e.getPlayer());
 			if (!message.startsWith("/")) {
@@ -83,13 +85,31 @@ public class PacketsListener {
 				WrappedChatComponent wcc = pc.getChatComponents().readSafely(0);
 				if (wcc != null) {
 					Object handle = wcc.getHandle();
+					Method m = null;
 					try {
-						Method m = handle.getClass().getMethod("c", new Class[0]);
+						m = handle.getClass().getMethod("c", new Class[0]);
+					} catch (IllegalArgumentException | SecurityException e1) {
+						e1.printStackTrace();
+						return;
+					} catch (NoSuchMethodException e2) {
+						// 1.9
+						try {
+							m = handle.getClass().getMethod("toPlainText", new Class[0]);
+						} catch (NoSuchMethodException | SecurityException e1) {
+							// not 1.9
+							e1.printStackTrace();
+							return;
+						}
+					}
+					if(m == null) {
+						// .-.
+						return;
+					}
+					try {
 						m.setAccessible(true);
 						text = String.valueOf(m.invoke(handle, new Object[0]));
 						cp.getSentMessages().add(new MessagePair(text, wcc.getJson(), false));
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-							| NoSuchMethodException | SecurityException e1) {
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
 						e1.printStackTrace();
 					}
 				}

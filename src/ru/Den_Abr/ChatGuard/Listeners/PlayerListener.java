@@ -30,7 +30,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
-		e.setMessage(substitude(e.getMessage()));
+		e.setMessage(substitute(e.getMessage()));
 
 		MessageInfo info = handleMessage(e.getMessage(), CGPlayer.get(e.getPlayer()));
 		if (info == null)
@@ -40,7 +40,7 @@ public class PlayerListener implements Listener {
 		e.setMessage(info.getClearMessage());
 	}
 
-	public static String substitude(String message) {
+	public static String substitute(String message) {
 		if (message == null)
 			return message;
 		for (Entry<String, String> s : Settings.getSubstitutions().entrySet()) {
@@ -51,7 +51,8 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerCommand(PlayerCommandPreprocessEvent e) {
-		e.setMessage(substitude(e.getMessage()));
+		if (getPMCommand(e.getMessage()) != null)
+			e.setMessage(substitute(e.getMessage()));
 
 		MessageInfo info = handleCommand(e.getMessage(), CGPlayer.get(e.getPlayer()));
 		if (info == null)
@@ -89,7 +90,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 
-		info = AbstractFilter.handleMessage(message, player, false);
+		info = AbstractFilter.handleMessage(message, player, true);
 
 		if (!info.getViolations().isEmpty()) {
 			if (Settings.isCancellingEnabled()) {
@@ -108,10 +109,8 @@ public class PlayerListener implements Listener {
 	public static MessageInfo handleCommand(String message, CGPlayer player) {
 		if (AbstractIntegration.shouldSkip(player.getPlayer()) || Settings.getCheckCommands().isEmpty())
 			return null;
-		String comand = message.split(" ")[0].toLowerCase();
-		comand = Utils.getOriginalCommand(comand);
-		ChatGuardPlugin.debug(2, "Command: " + comand, "Commands list: " + Settings.getCheckCommands());
-		if (!Settings.getCheckCommands().containsKey(comand))
+		String comand = getPMCommand(message);
+		if (comand == null)
 			return null;
 
 		String[] words = message.split(" ");
@@ -143,7 +142,7 @@ public class PlayerListener implements Listener {
 			return info;
 		}
 
-		MessageInfo info = AbstractFilter.handleMessage(cutMessage, player, false);
+		MessageInfo info = AbstractFilter.handleMessage(cutMessage, player, true);
 		info.setClearMessage(comand + info.getClearMessage());
 
 		if (!info.getViolations().isEmpty()) {
@@ -156,9 +155,19 @@ public class PlayerListener implements Listener {
 			return info;
 		}
 		player.setLastMessageTime(System.currentTimeMillis());
-		player.getLastMessages().add(message);
+		player.getLastMessages().add(cutMessage);
 
 		return info;
+	}
+
+	public static String getPMCommand(String mes) {
+		String comand = mes.split(" ")[0].toLowerCase();
+		comand = Utils.getOriginalCommand(comand);
+		ChatGuardPlugin.debug(2, "Command: " + comand, "Commands list: " + Settings.getCheckCommands());
+		if (!Settings.getCheckCommands().containsKey(comand)) {
+			return null;
+		}
+		return comand;
 	}
 
 	public static int isCooldownOver(CGPlayer pl) {

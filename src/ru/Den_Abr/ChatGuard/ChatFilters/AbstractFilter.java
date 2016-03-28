@@ -24,9 +24,9 @@ public abstract class AbstractFilter implements Filter {
 		info.setClearMessage(mes);
 		String copy = info.getOriginalMessage();
 		for (Filter f : getActiveFilters()) {
-			if (!isChat && f.getClass() == FloodFilter.class)
+			if (!isChat && f.getClass().equals(FloodFilter.class))
 				continue;
-			
+
 			Violation v = f.checkMessage(info.getOriginalMessage(), player);
 			if (v != null) {
 				copy = f.getClearMessage(copy, player);

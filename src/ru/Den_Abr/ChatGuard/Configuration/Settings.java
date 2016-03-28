@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventPriority;
 
 import com.google.common.io.Files;
 
@@ -19,7 +20,7 @@ import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class Settings {
-	private static final int CONFIG_VERSION = 4;
+	private static final int CONFIG_VERSION = 5;
 	private static YamlConfiguration config;
 
 	private static boolean checkUpdates;
@@ -39,6 +40,7 @@ public class Settings {
 	private static long maxMuteTime;
 
 	private static String replacement;
+	private static EventPriority prior;
 
 	private static Map<String, Integer> commands = new HashMap<>();
 	private static Map<String, String> reasons = new HashMap<>();
@@ -84,6 +86,11 @@ public class Settings {
 		maxMuteTime = Utils.parseTime(config.getString("Punishment settings.max mute time"));
 
 		replacement = config.getString("Messages.replacement");
+		prior = EventPriority.valueOf(config.getString("Other settings.event priority").toUpperCase());
+		if(prior == null) {
+			ChatGuardPlugin.getLog().warning("Wrong priority " + config.getString("Other settings.event priority").toUpperCase() + "! Using HIGHEST");
+			prior = EventPriority.HIGHEST;
+		}
 
 		maxWarnings = config.getInt("Warnings settings.max count");
 		debugLevel = config.getInt("Other settings.debug level");
@@ -235,9 +242,17 @@ public class Settings {
 				e.printStackTrace();
 			}
 
-			getConfig().set("Substitutions", Arrays.asList("1|2", "Red|Green", "@|a"));
+			getConfig().set("Substitutions", Arrays.asList("Red|Green"));
+		}
+		if (v == 4) {
+			getConfig().set("Version", 5);
+			getConfig().set("Other settings.event priority", "HIGHEST");
 		}
 		saveConfig();
+	}
+	
+	public static EventPriority getPriority() {
+		return prior;
 	}
 
 	public static Map<String, String> getSubstitutions() {

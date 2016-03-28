@@ -3,7 +3,15 @@ package ru.Den_Abr.ChatGuard;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.swing.text.AsyncBoxView;
+
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventException;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -51,7 +59,23 @@ public class ChatGuardPlugin extends JavaPlugin {
 
 		initMetrics();
 		if (!setupProtocol()) {
-			getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+			final PlayerListener listener = new PlayerListener();
+			EventExecutor exec = new EventExecutor() {
+
+				@Override
+				public void execute(Listener paramListener, Event e) throws EventException {
+					if (e instanceof AsyncPlayerChatEvent) {
+						listener.onPlayerChat((AsyncPlayerChatEvent) e);
+					}
+					if (e instanceof PlayerCommandPreprocessEvent) {
+						listener.onPlayerCommand((PlayerCommandPreprocessEvent) e);
+					}
+				}
+			};
+			getServer().getPluginManager().registerEvent(AsyncPlayerChatEvent.class, listener, Settings.getPriority(),
+					exec, this, true);
+			getServer().getPluginManager().registerEvent(PlayerCommandPreprocessEvent.class, listener,
+					Settings.getPriority(), exec, this, true);
 		}
 		getServer().getPluginManager().registerEvents(new SignListener(), this);
 		registerIntegratedPlugins();
