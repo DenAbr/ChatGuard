@@ -99,7 +99,7 @@ public class ItemListener implements Listener {
 			if (!checkFilters.contains(filter.getClass()))
 				continue;
 
-			if (!mes.equals(filter.getClearMessage(new String(mes), p))) {
+			if (filter.checkMessage(mes, p, true) != null) {
 				return true;
 			}
 		}

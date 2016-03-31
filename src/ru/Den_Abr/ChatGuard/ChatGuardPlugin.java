@@ -3,8 +3,6 @@ package ru.Den_Abr.ChatGuard;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.swing.text.AsyncBoxView;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;

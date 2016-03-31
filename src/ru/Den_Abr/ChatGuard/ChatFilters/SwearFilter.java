@@ -32,7 +32,7 @@ public class SwearFilter extends AbstractFilter {
 	private boolean informAdmins;
 
 	@Override
-	public Violation checkMessage(String message, CGPlayer player) {
+	public Violation checkMessage(String message, CGPlayer player, boolean justCheck) {
 		if (player.hasPermission("chatguard.ignore.swear"))
 			return null;
 		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": Hello!");
@@ -57,10 +57,15 @@ public class SwearFilter extends AbstractFilter {
 		}
 		if (Settings.isHardMode())
 			matches.clear();
-		if (v != null && informAdmins) {
+		if (!justCheck && v != null && informAdmins) {
 			informAdmins(player, message, matches);
 		}
 		return v;
+	}
+
+	@Override
+	public Violation checkMessage(String message, CGPlayer player) {
+		return checkMessage(message, player, false);
 	}
 
 	private void informAdmins(CGPlayer player, String message, List<String> matches) {

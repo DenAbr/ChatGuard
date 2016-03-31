@@ -17,7 +17,7 @@ public class CapsFilter extends AbstractFilter {
 	private int minLenght;
 
 	@Override
-	public Violation checkMessage(String message, CGPlayer player) {
+	public Violation checkMessage(String message, CGPlayer player, boolean justCheck) {
 		if (message.length() < minLenght)
 			return null;
 		if (player.hasPermission("chatguard.ignore.caps"))
@@ -30,17 +30,21 @@ public class CapsFilter extends AbstractFilter {
 		int capsCount = getCapsCount(ws);
 		int capspercent = capsCount * 100 / ws.length();
 		Violation v = (capspercent > maxCapsPercent) ? Violation.CAPS : null;
-		if (v != null && informAdmins) {
+		if (!justCheck && v != null && informAdmins) {
 			informAdmins(player, message);
 		}
 		return v;
 	}
 
+	@Override
+	public Violation checkMessage(String message, CGPlayer player) {
+		return checkMessage(message, player, false);
+	}
+
 	private void informAdmins(CGPlayer player, String message) {
 		String complete = Message.INFORM_CAPS.get().replace("{PLAYER}", player.getName()).replace("{MESSAGE}", message);
 		Bukkit.getConsoleSender().sendMessage(complete);
-		Bukkit.broadcast(complete,
-				"chatguard.inform.caps");
+		Bukkit.broadcast(complete, "chatguard.inform.caps");
 	}
 
 	private int getCapsCount(String message) {
@@ -78,7 +82,7 @@ public class CapsFilter extends AbstractFilter {
 	public void addMetricsGraph() {
 		Graph g = ChatGuardPlugin.metrics.getOrCreateGraph("Filters used");
 		g.addPlotter(new Plotter("Caps filter") {
-			
+
 			@Override
 			public int getValue() {
 				return 1;

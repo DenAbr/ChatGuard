@@ -17,7 +17,7 @@ public class CharacterFilter extends AbstractFilter {
 	private String charSet;
 
 	@Override
-	public Violation checkMessage(String message, CGPlayer player) {
+	public Violation checkMessage(String message, CGPlayer player, boolean justCheck) {
 		if (player.hasPermission("chatguard.ignore.characters"))
 			return null;
 		for (char c : message.toCharArray()) {
@@ -26,6 +26,11 @@ public class CharacterFilter extends AbstractFilter {
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public Violation checkMessage(String message, CGPlayer player) {
+		return checkMessage(message, player, false);
 	}
 
 	@Override

@@ -19,7 +19,7 @@ public class FloodFilter extends AbstractFilter {
 	private int levels;
 
 	@Override
-	public Violation checkMessage(String message, CGPlayer player) {
+	public Violation checkMessage(String message, CGPlayer player, boolean justCheck) {
 		Violation v = null;
 		if (player.hasPermission("chatguard.ignore.flood"))
 			return v;
@@ -44,10 +44,15 @@ public class FloodFilter extends AbstractFilter {
 				v = Violation.FLOOD;
 			}
 		}
-		if (v != null && informAdmins) {
+		if (!justCheck && v != null && informAdmins) {
 			informAdmins(player, message);
 		}
 		return v;
+	}
+
+	@Override
+	public Violation checkMessage(String message, CGPlayer player) {
+		return checkMessage(message, player, false);
 	}
 
 	private void informAdmins(CGPlayer player, String message) {
