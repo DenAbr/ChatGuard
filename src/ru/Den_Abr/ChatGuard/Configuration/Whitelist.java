@@ -41,11 +41,11 @@ public class Whitelist {
 		}
 	}
 
-	public static boolean isWhitelisted(String found) {
+	public static Pattern checkWhitelisted(String found) {
 		for (Pattern p : whitelisted) {
 			if (p.matcher(found).find())
-				return true;
+				return p;
 		}
-		return false;
+		return null;
 	}
 }

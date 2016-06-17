@@ -43,14 +43,14 @@ public class SpamFilter extends AbstractFilter {
 		List<String> matches = new ArrayList<>();
 		while (ipMatcher.find()) {
 			String found = ipMatcher.group();
-			if (Whitelist.isWhitelisted(found))
+			if (Whitelist.checkWhitelisted(found) != null)
 				continue;
 			matches.add(found);
 			v = Violation.SPAM;
 		}
 		while (domMatcher.find()) {
 			String found = domMatcher.group();
-			if (Whitelist.isWhitelisted(found))
+			if (Whitelist.checkWhitelisted(found) != null)
 				continue;
 			matches.add(found);
 			v = Violation.SPAM;
@@ -93,7 +93,7 @@ public class SpamFilter extends AbstractFilter {
 		Matcher domMatcher = domainPattern.matcher(message);
 		while (ipMatcher.find()) {
 			String group = ipMatcher.group();
-			if (Whitelist.isWhitelisted(group)) {
+			if (Whitelist.checkWhitelisted(group) != null) {
 				continue;
 			}
 			message = message.replace(group, Settings.isSeparatedWarnings() ? replacement : Settings.getReplacement());
@@ -102,7 +102,7 @@ public class SpamFilter extends AbstractFilter {
 
 			String found = Utils.getWord(message, domMatcher.start(), domMatcher.end());
 
-			if (Whitelist.isWhitelisted(found)) {
+			if (Whitelist.checkWhitelisted(found) != null) {
 				continue;
 			}
 

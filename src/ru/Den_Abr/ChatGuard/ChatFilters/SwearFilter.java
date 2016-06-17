@@ -48,9 +48,21 @@ public class SwearFilter extends AbstractFilter {
 				continue;
 			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
 			ChatGuardPlugin.debug(1, getClass().getSimpleName() + " found: " + swearMatcher.group());
-			if (Whitelist.isWhitelisted(found.toLowerCase())) {
-				ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": " + found + " is whitelisted");
-				continue;
+			Pattern wp = Whitelist.checkWhitelisted(found.toLowerCase());
+			if (wp != null) {
+				ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": got whitelist pattern " + wp.pattern()
+						+ " for string " + found);
+				String withoutWhitelisted = found.replaceAll(wp.pattern(), "");
+				ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": " + found + " without " + wp.pattern() + " - "
+						+ withoutWhitelisted);
+				if (!swearPattern.matcher(withoutWhitelisted).find()) {
+					ChatGuardPlugin.debug(2,
+							getClass().getSimpleName() + ": " + withoutWhitelisted + " is not swearing. Skipping.");
+					continue;
+				} else {
+					ChatGuardPlugin.debug(2,
+							getClass().getSimpleName() + ": " + withoutWhitelisted + " is swearing. Do not whitelist.");
+				}
 			}
 			matches.add(found);
 			v = Violation.SWEAR;
@@ -89,8 +101,18 @@ public class SwearFilter extends AbstractFilter {
 			if (swearMatcher.group().trim().isEmpty())
 				continue;
 			String found = Utils.getWord(message, swearMatcher.start(), swearMatcher.end());
-			if (Whitelist.isWhitelisted(found.toLowerCase()))
-				continue;
+			Pattern wp = Whitelist.checkWhitelisted(found.toLowerCase());
+			if (wp != null) {
+				String withoutWhitelisted = found.replaceAll(wp.pattern(), "");
+				if (!swearPattern.matcher(withoutWhitelisted).find()) {
+					ChatGuardPlugin.debug(2,
+							getClass().getSimpleName() + ": " + withoutWhitelisted + " is not swearing. Skipping.");
+					continue;
+				} else {
+					ChatGuardPlugin.debug(2,
+							getClass().getSimpleName() + ": " + withoutWhitelisted + " is swearing. Do not whitelist.");
+				}
+			}
 
 			toReplace.add(found);
 		}
