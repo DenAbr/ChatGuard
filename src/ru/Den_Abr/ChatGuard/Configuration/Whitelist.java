@@ -43,7 +43,7 @@ public class Whitelist {
 
 	public static Pattern checkWhitelisted(String found) {
 		for (Pattern p : whitelisted) {
-			if (p.matcher(found).find())
+			if (p.matcher(found.toLowerCase()).find())
 				return p;
 		}
 		return null;

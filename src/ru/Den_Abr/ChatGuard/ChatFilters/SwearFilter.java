@@ -52,7 +52,7 @@ public class SwearFilter extends AbstractFilter {
 			if (wp != null) {
 				ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": got whitelist pattern " + wp.pattern()
 						+ " for string " + found);
-				String withoutWhitelisted = found.replaceAll(wp.pattern(), "");
+				String withoutWhitelisted = found.toLowerCase().replaceAll(wp.pattern(), "");
 				ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": " + found + " without " + wp.pattern() + " - "
 						+ withoutWhitelisted);
 				if (!swearPattern.matcher(withoutWhitelisted).find()) {
