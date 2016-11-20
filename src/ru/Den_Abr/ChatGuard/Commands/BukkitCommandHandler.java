@@ -131,7 +131,7 @@ public class BukkitCommandHandler {
 				PlayerListener.globalMute ? Message.GLOBAL_MUTE_ENABLED.get() : Message.GLOBAL_MUTE_DISABLED.get());
 	}
 
-	@Cmd(desc = "Mute player for some reason", name = "mute", perm = "chatguard.mute", args = "[Player] ([Time] (Reason))", min = 1, max = 3)
+	@Cmd(desc = "Mute player for some reason", name = "mute", perm = "chatguard.mute", args = "[Player] ([Time] (Reason))", min = 1, max = 99)
 	public void mute(CommandSender cs, String[] args) {
 		Player pl = Bukkit.getPlayer(args[0]);
 		if (pl == null) {
