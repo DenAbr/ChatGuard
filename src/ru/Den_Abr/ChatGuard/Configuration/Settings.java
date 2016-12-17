@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,7 @@ import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class Settings {
-	private static final int CONFIG_VERSION = 5;
+	private static final int CONFIG_VERSION = 6;
 	private static YamlConfiguration config;
 
 	private static boolean checkUpdates;
@@ -45,6 +47,8 @@ public class Settings {
 	private static Map<String, Integer> commands = new HashMap<>();
 	private static Map<String, String> reasons = new HashMap<>();
 	private static Map<String, String> substitutions = new HashMap<>();
+	
+	private static List<String> disabledIntegrations = new ArrayList<>();
 
 	public static void load(ChatGuardPlugin pl) {
 		File fconfig = new File(pl.getDataFolder(), "config.yml");
@@ -115,6 +119,9 @@ public class Settings {
 				continue;
 			substitutions.put(els[0], els[1]);
 		}
+		
+		disabledIntegrations.clear();
+		disabledIntegrations.addAll(config.getStringList("Other settings.disabled integrations"));
 
 		if (debugLevel > 0) {
 			ChatGuardPlugin.debug(1, "Debug level: " + getDebugLevel());
@@ -243,10 +250,17 @@ public class Settings {
 			}
 
 			getConfig().set("Substitutions", Arrays.asList("Red|Green"));
+			v = 4;
 		}
 		if (v == 4) {
 			getConfig().set("Version", 5);
 			getConfig().set("Other settings.event priority", "HIGHEST");
+			v = 5;
+		}
+		if(v == 5) {
+			getConfig().set("Version", 6);
+			getConfig().set("Other settings.disabled integrations", Collections.EMPTY_LIST);
+			v = 6;
 		}
 		saveConfig();
 	}
@@ -257,5 +271,9 @@ public class Settings {
 
 	public static Map<String, String> getSubstitutions() {
 		return substitutions;
+	}
+	
+	public static List<String> getDisabledIntegrations() {
+		return disabledIntegrations;
 	}
 }

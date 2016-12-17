@@ -27,6 +27,7 @@ import ru.Den_Abr.ChatGuard.Integration.AbstractIntegration;
 import ru.Den_Abr.ChatGuard.Integration.AuthMe34;
 import ru.Den_Abr.ChatGuard.Integration.AuthMe5;
 import ru.Den_Abr.ChatGuard.Integration.AuthMeLegacy;
+import ru.Den_Abr.ChatGuard.Integration.NoCheatPlus;
 import ru.Den_Abr.ChatGuard.Listeners.ItemListener;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
@@ -98,6 +99,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 		new AuthMeLegacy().register();
 		new AuthMe34().register();
 		new AuthMe5().register();
+		new NoCheatPlus().register();
 	}
 
 	// the same as integration
@@ -109,7 +111,6 @@ public class ChatGuardPlugin extends JavaPlugin {
 		new CapsFilter().register();
 		new SpamFilter().register();
 		new SwearFilter().register();
-
 	}
 
 	private void initMetrics() {

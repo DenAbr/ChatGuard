@@ -39,6 +39,7 @@ public class ItemListener implements Listener {
 							ItemStack item = p.getInventory().getItem(i);
 							if (item == null || item.getType() == Material.AIR || !item.hasItemMeta())
 								continue;
+							item = item.clone();
 							boolean changed = false;
 							ItemMeta im = item.getItemMeta();
 							if (im.hasDisplayName()) {

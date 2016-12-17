@@ -30,11 +30,4 @@ public class AuthMeLegacy extends AbstractIntegration {
 		}
 		return plugin != null && pl.isEnabled();
 	}
-
-	@Override
-	public void register() {
-		if (load()) {
-			getIntegratedPlugins().add(this);
-		}
-	}
 }

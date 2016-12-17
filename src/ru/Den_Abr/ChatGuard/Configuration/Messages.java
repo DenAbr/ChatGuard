@@ -12,6 +12,7 @@ public class Messages {
 	private static final int VERSION = 3;
 
 	public enum Message {
+		// Dat Eclipse formatting
 		PLAYER_NOT_FOUND("player not found"), INFORM_CAPS("inform caps"), INFORM_SPAM("inform spam"), INFORM_SWEAR(
 				"inform swear"), WAIT_COOLDOWN("wait cooldown"), SEC("sec"), GLOBAL_MUTE("global mute"), NO_PERMS(
 						"no permissions"), GLOBAL_MUTE_ENABLED("global mute enabled"), GLOBAL_MUTE_DISABLED(
