@@ -7,9 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
@@ -18,10 +15,8 @@ import ru.Den_Abr.ChatGuard.Configuration.Messages;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
-import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
-import ru.Den_Abr.ChatGuard.Utils.MessagePair;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
 
 public class BukkitCommandHandler {
@@ -92,7 +87,6 @@ public class BukkitCommandHandler {
 		if (args.length == 0) {
 			if (cs instanceof Player) {
 				Utils.clearChat((Player) cs);
-				CGPlayer.get((Player) cs).getSentMessages().clear();
 			} else {
 				// Console or command block doesnt have chat
 				cs.sendMessage("No.");
@@ -103,7 +97,6 @@ public class BukkitCommandHandler {
 			for (Player p : Utils.getOnlinePlayers()) {
 				if (!p.hasPermission("chatguard.ignore.cc")) {
 					Utils.clearChat(p);
-					CGPlayer.get(p).getSentMessages().clear();
 				}
 			}
 			return;
@@ -115,7 +108,6 @@ public class BukkitCommandHandler {
 				return;
 			} else {
 				Utils.clearChat(p);
-				CGPlayer.get(p).getSentMessages().clear();
 			}
 		} else {
 			cs.sendMessage(Message.NO_PERMS.get());
@@ -205,36 +197,7 @@ public class BukkitCommandHandler {
 		cs.sendMessage(Message.SUCCESSFULLY.get());
 
 	}
-
-	@Cmd(desc = "Clear messages of specified player", name = "of", perm = "chatguard.clearof", min = 1)
-	public void of(CommandSender cs, String[] args) {
-		if(!Settings.usePackets()) {
-			cs.sendMessage(ChatColor.RED + "Enable 'use packets' settings first.");
-			return;
-		}
-		CGPlayer cp = CGPlayer.get(args[0]);
-		if (cp == null) {
-			cs.sendMessage(Message.PLAYER_NOT_FOUND.get());
-			return;
-		}
-		for (Player p : Utils.getOnlinePlayers()) {
-			p.setMetadata("clearing", new FixedMetadataValue(ChatGuardPlugin.getInstance(), true));
-			CGPlayer clp = CGPlayer.get(p);
-			Utils.clearChat(p);
-			pairs: for (MessagePair mp : clp.getSentMessages()) {
-				for (String am : cp.getAllMessages()) {
-					if (mp.getKey().toLowerCase().contains(am))
-						continue pairs;
-				}
-				if (!mp.isOld())
-					PacketsListener.sendComponent(p, WrappedChatComponent.fromJson(mp.getValue()));
-				else
-					p.sendMessage(mp.getValue());
-			}
-			p.removeMetadata("clearing", ChatGuardPlugin.getInstance());
-		}
-	}
-
+	
 	@Cmd(desc = "Warn [Player]", name = "warn", perm = "chatguard.warn", args = "[Player] [Type]", min = 2, max = 2)
 	public void warn(CommandSender cs, String[] args) {
 		Player p = Bukkit.getPlayer(args[0]);

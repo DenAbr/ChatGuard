@@ -10,21 +10,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.common.base.Objects;
+
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Utils.FixedSizeList;
-import ru.Den_Abr.ChatGuard.Utils.MessagePair;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
-
-import com.google.common.base.Objects;
 
 public abstract class CGPlayer {
 	private static List<CGPlayer> cache = new LinkedList<>();
 
 	private FixedSizeList<String> lastMessages = new FixedSizeList<>(1);
-	private FixedSizeList<MessagePair> sentMessages = new FixedSizeList<>(100);
 	private FixedSizeList<String> allMessages = new FixedSizeList<>(100);
 	private List<Violation> violations = new ArrayList<>();
 	protected long lastMessage = -1L;
@@ -136,10 +134,6 @@ public abstract class CGPlayer {
 		for (CGPlayer player : cache) {
 			player.clearWarnings(v, separate);
 		}
-	}
-
-	public FixedSizeList<MessagePair> getSentMessages() {
-		return sentMessages;
 	}
 	
 	public FixedSizeList<String> getAllMessages() {
