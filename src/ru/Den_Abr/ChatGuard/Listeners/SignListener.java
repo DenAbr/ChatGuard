@@ -22,7 +22,7 @@ public class SignListener implements Listener {
 			String line = e.getLine(i);
 			if (line.isEmpty())
 				continue;
-			MessageInfo info = AbstractFilter.handleMessage(line, player, true);
+			MessageInfo info = AbstractFilter.handleMessage(line, player, false);
 			e.setLine(i, info.getClearMessage());
 
 			if (!info.getViolations().isEmpty()) {
