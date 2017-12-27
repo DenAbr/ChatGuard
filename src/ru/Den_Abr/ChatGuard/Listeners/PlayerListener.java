@@ -131,7 +131,7 @@ public class PlayerListener implements Listener {
 
 		comand += " " + skipped;
 
-		if (cutMessage.isEmpty())
+		if (cutMessage.isEmpty() && offset > 1)
 			return null;
 
 		if (player.isMuted()) {

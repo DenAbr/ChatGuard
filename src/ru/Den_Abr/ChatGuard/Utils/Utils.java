@@ -2,6 +2,7 @@ package ru.Den_Abr.ChatGuard.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -11,7 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.command.Command;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 
 import com.google.common.io.Files;
@@ -70,7 +72,15 @@ public class Utils {
 	public static String getOriginalCommand(String lowerCase) {
 		String[] splitted = lowerCase.split(" ");
 		String first = splitted[0];
-		PluginCommand pc = Bukkit.getPluginCommand(first);
+
+        Command pc = null;
+        try {
+            SimpleCommandMap scm = (SimpleCommandMap) getFromField(Bukkit.getServer(), "commandMap");
+            pc = scm.getCommand(first);
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
+		
 		if (pc != null) {
 			first = pc.getName();
 			splitted[0] = first;
@@ -79,6 +89,12 @@ public class Utils {
 		return lowerCase;
 	}
 
+    public static Object getFromField(Object instance, String field) throws ReflectiveOperationException {
+        Field f = instance.getClass().getDeclaredField(field);
+        f.setAccessible(true);
+        return f.get(instance);
+    }
+    
 	public static String getWord(String message, int start, int end) {
 		int wordStart = 0;
 		int wordEnd = message.length();

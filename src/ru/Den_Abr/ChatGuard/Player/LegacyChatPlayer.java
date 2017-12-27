@@ -1,34 +1,28 @@
 package ru.Den_Abr.ChatGuard.Player;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-/** This implementation is needed for intagrating UUID system in the future **/
-
 public class LegacyChatPlayer extends CGPlayer {
-	private Player p;
+    private String p;
 
-	public LegacyChatPlayer(Player p) {
-		this.p = p;
-	}
+    public LegacyChatPlayer(Player p) {
+        this.p = p.getName();
+    }
 
-	@Override
-	public boolean hasPermission(String perm) {
-		return p.hasPermission(perm);
-	}
+    @Override
+    public boolean hasPermission(String perm) {
+        return getPlayer() != null && getPlayer().hasPermission(perm);
+    }
 
-	@Override
-	public String getName() {
-		return p.getName();
-	}
+    @Override
+    public String getName() {
+        return p;
+    }
 
-	@Override 
-	public Player getPlayer() {
-		return p;
-	}
-
-	@Override
-	public void updatePlayer(Player p) {
-		this.p = p;
-	}
+    @Override
+    public Player getPlayer() {
+        return Bukkit.getPlayerExact(getName());
+    }
 
 }
