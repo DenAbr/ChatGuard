@@ -34,8 +34,6 @@ import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Listeners.SignListener;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
-import thirdparty.net.gravitydevelopment.updater.Updater;
-import thirdparty.net.gravitydevelopment.updater.Updater.UpdateType;
 import thirdparty.org.mcstats.Metrics;
 
 public class ChatGuardPlugin extends JavaPlugin {
@@ -49,9 +47,6 @@ public class ChatGuardPlugin extends JavaPlugin {
 		getCommand("cg").setExecutor(new CommandManager(this));
 
 		Settings.load(this);
-		if (Settings.canCheckUpdates()) {
-			checkForUpdates();
-		}
 		Messages.load(this);
 		Whitelist.load(this);
 		ItemListener.scheduleChecks();
@@ -125,11 +120,7 @@ public class ChatGuardPlugin extends JavaPlugin {
 		if (null != metrics)
 			metrics.start();
 	}
-
-	private void checkForUpdates() {
-		new Updater(this, 50092, getFile(), UpdateType.DEFAULT, true);
-	}
-
+	
 	public static ChatGuardPlugin getInstance() {
 		return instance;
 	}

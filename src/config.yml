@@ -7,8 +7,6 @@
 # dont touch this
 Version: 6
 
-Check for updates: true
-
 # NOTICE: Enabling Hard Mode enables message cancelling automatically 
 # experimental function
 Hard mode: false

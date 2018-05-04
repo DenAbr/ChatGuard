@@ -25,7 +25,6 @@ public class Settings {
 	private static final int CONFIG_VERSION = 6;
 	private static YamlConfiguration config;
 
-	private static boolean checkUpdates;
 	private static boolean usePackets;
 	private static boolean separateWarnings;
 	private static boolean hardmode;
@@ -77,7 +76,6 @@ public class Settings {
 			migrateFrom(config.getInt("Version"));
 		}
 
-		checkUpdates = config.getBoolean("Check for updates");
 		usePackets = config.getBoolean("Other settings.use packets");
 		separateWarnings = config.getBoolean("Warnings settings.separate");
 		hardmode = config.getBoolean("Hard mode");
@@ -126,10 +124,6 @@ public class Settings {
 		if (debugLevel > 0) {
 			ChatGuardPlugin.debug(1, "Debug level: " + getDebugLevel());
 		}
-	}
-
-	public static boolean canCheckUpdates() {
-		return checkUpdates;
 	}
 
 	public static boolean usePackets() {
