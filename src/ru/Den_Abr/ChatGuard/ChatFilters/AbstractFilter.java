@@ -18,10 +18,7 @@ public abstract class AbstractFilter implements Filter {
 	}
 
 	public static MessageInfo handleMessage(String mes, CGPlayer player, boolean isChat) {
-		MessageInfo info = new MessageInfo();
-		info.setPlayer(player);
-		info.setOriginalMessage(mes);
-		info.setClearMessage(mes);
+		MessageInfo info = new MessageInfo(mes, player);
 		String copy = info.getOriginalMessage();
 		for (Filter f : getActiveFilters()) {
 			if (!isChat && (f.getClass().equals(FloodFilter.class) || f.getClass().equals(CapsFilter.class)))

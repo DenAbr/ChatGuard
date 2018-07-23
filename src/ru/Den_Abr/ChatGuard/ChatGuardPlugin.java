@@ -28,6 +28,7 @@ import ru.Den_Abr.ChatGuard.Integration.AuthMe34;
 import ru.Den_Abr.ChatGuard.Integration.AuthMe5;
 import ru.Den_Abr.ChatGuard.Integration.AuthMeLegacy;
 import ru.Den_Abr.ChatGuard.Integration.NoCheatPlus;
+import ru.Den_Abr.ChatGuard.Listeners.FallbackCommandsListener;
 import ru.Den_Abr.ChatGuard.Listeners.ItemListener;
 import ru.Den_Abr.ChatGuard.Listeners.PacketsListener;
 import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
@@ -37,124 +38,125 @@ import ru.Den_Abr.ChatGuard.Utils.Utils;
 import thirdparty.org.mcstats.Metrics;
 
 public class ChatGuardPlugin extends JavaPlugin {
-	private static ChatGuardPlugin instance;
-	public static Metrics metrics;
+    private static ChatGuardPlugin instance;
+    public static Metrics metrics;
 
-	@Override
-	public void onEnable() {
-		instance = this;
+    @Override
+    public void onEnable() {
+        instance = this;
 
-		getCommand("cg").setExecutor(new CommandManager(this));
+        getCommand("cg").setExecutor(new CommandManager(this));
 
-		Settings.load(this);
-		Messages.load(this);
-		Whitelist.load(this);
-		ItemListener.scheduleChecks();
+        Settings.load(this);
+        Messages.load(this);
+        Whitelist.load(this);
+        ItemListener.scheduleChecks();
 
-		initMetrics();
-		if (!setupProtocol()) {
-			final PlayerListener listener = new PlayerListener();
-			EventExecutor exec = new EventExecutor() {
+        initMetrics();
+        if (!setupProtocol()) {
+            final PlayerListener listener = new PlayerListener();
+            EventExecutor exec = new EventExecutor() {
 
-				@Override
-				public void execute(Listener paramListener, Event e) throws EventException {
-					if (e instanceof AsyncPlayerChatEvent) {
-						listener.onPlayerChat((AsyncPlayerChatEvent) e);
-					}
-					if (e instanceof PlayerCommandPreprocessEvent) {
-						listener.onPlayerCommand((PlayerCommandPreprocessEvent) e);
-					}
-				}
-			};
-			getServer().getPluginManager().registerEvent(AsyncPlayerChatEvent.class, listener, Settings.getPriority(),
-					exec, this, true);
-			getServer().getPluginManager().registerEvent(PlayerCommandPreprocessEvent.class, listener,
-					Settings.getPriority(), exec, this, true);
-		}
-		getServer().getPluginManager().registerEvents(new SignListener(), this);
-		registerIntegratedPlugins();
-		registerFilters();
-		loadOnlinePlayers();
+                @Override
+                public void execute(Listener paramListener, Event e) throws EventException {
+                    if (e instanceof AsyncPlayerChatEvent) {
+                        listener.onPlayerChat((AsyncPlayerChatEvent) e);
+                    }
+                    if (e instanceof PlayerCommandPreprocessEvent) {
+                        listener.onPlayerCommand((PlayerCommandPreprocessEvent) e);
+                    }
+                }
+            };
+            getServer().getPluginManager().registerEvent(AsyncPlayerChatEvent.class, listener, Settings.getPriority(),
+                    exec, this, true);
+            getServer().getPluginManager().registerEvent(PlayerCommandPreprocessEvent.class, listener,
+                    Settings.getPriority(), exec, this, true);
+            getServer().getPluginManager().registerEvents(new FallbackCommandsListener(), this);
+        }
+        getServer().getPluginManager().registerEvents(new SignListener(), this);
+        registerIntegratedPlugins();
+        registerFilters();
+        loadOnlinePlayers();
 
-		startMetrics();
+        startMetrics();
 
-		getLogger().info("ChatGuard enabled!");
-	}
+        getLogger().info("ChatGuard enabled!");
+    }
 
-	private void loadOnlinePlayers() {
-		for (Player p : Utils.getOnlinePlayers()) {
-			CGPlayer.get(p);
-		}
-	}
+    private void loadOnlinePlayers() {
+        for (Player p : Utils.getOnlinePlayers()) {
+            CGPlayer.get(p);
+        }
+    }
 
-	private void registerIntegratedPlugins() {
-		AbstractIntegration.getIntegratedPlugins().clear();
+    private void registerIntegratedPlugins() {
+        AbstractIntegration.getIntegratedPlugins().clear();
 
-		// you can do it from your's plugins
-		new AuthMeLegacy().register();
-		new AuthMe34().register();
-		new AuthMe5().register();
-		new NoCheatPlus().register();
-	}
+        // you can do it from your's plugins
+        new AuthMeLegacy().register();
+        new AuthMe34().register();
+        new AuthMe5().register();
+        new NoCheatPlus().register();
+    }
 
-	// the same as integration
-	public void registerFilters() {
-		AbstractFilter.getActiveFilters().clear();
+    // the same as integration
+    public void registerFilters() {
+        AbstractFilter.getActiveFilters().clear();
 
-		new CharacterFilter().register();
-		new FloodFilter().register();
-		new CapsFilter().register();
-		new SpamFilter().register();
-		new SwearFilter().register();
-	}
+        new CharacterFilter().register();
+        new FloodFilter().register();
+        new CapsFilter().register();
+        new SpamFilter().register();
+        new SwearFilter().register();
+    }
 
-	private void initMetrics() {
-		try {
-			metrics = new Metrics(this);
-		} catch (IOException e) {
-			getLogger().warning("Failed to init metrics");
-		}
-	}
+    private void initMetrics() {
+        try {
+            metrics = new Metrics(this);
+        } catch (IOException e) {
+            getLogger().warning("Failed to init metrics");
+        }
+    }
 
-	private void startMetrics() {
-		if (null != metrics)
-			metrics.start();
-	}
-	
-	public static ChatGuardPlugin getInstance() {
-		return instance;
-	}
+    private void startMetrics() {
+        if (null != metrics)
+            metrics.start();
+    }
 
-	private boolean setupProtocol() {
-		if (!Settings.usePackets()) {
-			return false;
-		}
-		Plugin plpl = getServer().getPluginManager().getPlugin("ProtocolLib");
-		if (null != plpl && plpl.isEnabled()) {
-			getLogger().info("ProtocolLib found!");
-			PacketsListener.startListening();
-			return true;
-		} else
-			getLogger().info("Install ProtocolLib to enable 'use packets' setting");
-		return false;
-	}
+    public static ChatGuardPlugin getInstance() {
+        return instance;
+    }
 
-	@Override
-	public void onDisable() {
-		if (Settings.usePackets())
-			PacketsListener.stopListening();
-		getServer().getScheduler().cancelTasks(this);
-	}
+    private boolean setupProtocol() {
+        if (!Settings.usePackets()) {
+            return false;
+        }
+        Plugin plpl = getServer().getPluginManager().getPlugin("ProtocolLib");
+        if (null != plpl && plpl.isEnabled()) {
+            getLogger().info("ProtocolLib found!");
+            PacketsListener.startListening();
+            return true;
+        } else
+            getLogger().info("Install ProtocolLib before activating 'use packets' setting");
+        return false;
+    }
 
-	public static void debug(int level, Object... o) {
-		if (level > Settings.getDebugLevel())
-			return;
-		for (Object obj : o)
-			getInstance().getLogger().info("[DEBUG " + level + "] " + obj);
-	}
+    @Override
+    public void onDisable() {
+        if (Settings.usePackets())
+            PacketsListener.stopListening();
+        getServer().getScheduler().cancelTasks(this);
+    }
 
-	public static Logger getLog() {
-		return getInstance().getLogger();
-	}
+    public static void debug(int level, Object... o) {
+        if (level > Settings.getDebugLevel())
+            return;
+        for (Object obj : o)
+            getInstance().getLogger().info("[DEBUG " + level + "] " + obj);
+    }
+
+    public static Logger getLog() {
+        return getInstance().getLogger();
+    }
 
 }

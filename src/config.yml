@@ -102,6 +102,8 @@ Other settings:
     # works only if packet listening is disabled
     # available priorities HIGHEST, HIGH, NORMAL, LOW, LOWEST, MONITOR(not recommended to use)
     event priority: HIGHEST
+    # if true, plugin will remove plugin name from command: /anyplugin:command -> /command
+    remove command fallback prefix: false
     # Type plugin integration name to disable it if you have issues with it
     # Names - AuthMe34, AuthMe5, AuthMeLegacy, NoCheatPlus
     disabled integrations: []
