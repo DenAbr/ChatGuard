@@ -1,0 +1,11 @@
+name: ChatGuard
+main: ru.Den_Abr.ChatGuard.ChatGuardPlugin
+version: 7.6.0
+author: Den_Abr
+description: Guard for your chat
+softdepend: [ProtocolLib, AuthMe, NoCheatPlus]
+commands:
+    cg:
+       description: ChatGuard commands.
+       usage: /<command>
+       aliases: [chatguard]
