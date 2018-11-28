@@ -1,8 +1,8 @@
 package ru.Den_Abr.ChatGuard;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -33,7 +33,6 @@ import ru.Den_Abr.ChatGuard.Listeners.PlayerListener;
 import ru.Den_Abr.ChatGuard.Listeners.SignListener;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
-import org.mcstats.Metrics;
 
 public class ChatGuardPlugin extends JavaPlugin {
     private static ChatGuardPlugin instance;
@@ -76,8 +75,6 @@ public class ChatGuardPlugin extends JavaPlugin {
         registerFilters();
         loadOnlinePlayers();
 
-        startMetrics();
-
         getLogger().info("ChatGuard enabled!");
     }
 
@@ -107,16 +104,7 @@ public class ChatGuardPlugin extends JavaPlugin {
     }
 
     private void initMetrics() {
-        try {
-            metrics = new Metrics(this);
-        } catch (IOException e) {
-            getLogger().warning("Failed to init metrics");
-        }
-    }
-
-    private void startMetrics() {
-        if (null != metrics)
-            metrics.start();
+        metrics = new Metrics(this);
     }
 
     public static ChatGuardPlugin getInstance() {

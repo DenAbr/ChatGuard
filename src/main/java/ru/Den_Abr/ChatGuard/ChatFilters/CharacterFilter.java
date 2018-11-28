@@ -4,14 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import com.google.common.io.Files;
+
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
 import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
-import org.mcstats.Metrics.Graph;
-import org.mcstats.Metrics.Plotter;
-
-import com.google.common.io.Files;
 
 public class CharacterFilter extends AbstractFilter {
 	private String charSet;
@@ -72,15 +70,5 @@ public class CharacterFilter extends AbstractFilter {
 			e.printStackTrace();
 		}
 	}
-	@Override
-	public void addMetricsGraph() {
-		Graph g = ChatGuardPlugin.metrics.getOrCreateGraph("Filters used");
-		g.addPlotter(new Plotter("Character filter") {
-			
-			@Override
-			public int getValue() {
-				return 1;
-			}
-		});
-	}
+
 }

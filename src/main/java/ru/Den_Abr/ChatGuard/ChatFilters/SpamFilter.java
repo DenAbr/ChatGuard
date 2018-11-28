@@ -17,8 +17,6 @@ import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Configuration.Whitelist;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
 import ru.Den_Abr.ChatGuard.Utils.Utils;
-import org.mcstats.Metrics.Graph;
-import org.mcstats.Metrics.Plotter;
 
 public class SpamFilter extends AbstractFilter {
 	private Pattern ipPattern;
@@ -156,15 +154,4 @@ public class SpamFilter extends AbstractFilter {
 		return;
 	}
 
-	@Override
-	public void addMetricsGraph() {
-		Graph g = ChatGuardPlugin.metrics.getOrCreateGraph("Filters used");
-		g.addPlotter(new Plotter("Spam filter") {
-
-			@Override
-			public int getValue() {
-				return 1;
-			}
-		});
-	}
 }

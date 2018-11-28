@@ -4,5 +4,7 @@
 /build.xml
 
 /.classpath
-/target
+/build/
 /.idea
+/.gradle
+/gradle

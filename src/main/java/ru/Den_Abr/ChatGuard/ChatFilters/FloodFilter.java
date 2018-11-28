@@ -10,8 +10,6 @@ import ru.Den_Abr.ChatGuard.Violation;
 import ru.Den_Abr.ChatGuard.Configuration.Messages.Message;
 import ru.Den_Abr.ChatGuard.Configuration.Settings;
 import ru.Den_Abr.ChatGuard.Player.CGPlayer;
-import org.mcstats.Metrics.Graph;
-import org.mcstats.Metrics.Plotter;
 
 public class FloodFilter extends AbstractFilter {
 	private boolean informAdmins;
@@ -81,15 +79,4 @@ public class FloodFilter extends AbstractFilter {
 		getActiveFilters().add(this);
 	}
 
-	@Override
-	public void addMetricsGraph() {
-		Graph g = ChatGuardPlugin.metrics.getOrCreateGraph("Filters used");
-		g.addPlotter(new Plotter("Flood filter") {
-
-			@Override
-			public int getValue() {
-				return 1;
-			}
-		});
-	}
 }
