@@ -20,8 +20,9 @@ public interface Filter {
     public void register();
 
     default void addMetricsGraph() {
-        ChatGuardPlugin.metrics.addCustomChart(
-                new Metrics.SimplePie("filters_used", () -> getClass().getSimpleName().replace("Filter", "")));
+        if (ChatGuardPlugin.metrics.isEnabled())
+            ChatGuardPlugin.metrics.addCustomChart(
+                    new Metrics.SimplePie("filters_used", () -> getClass().getSimpleName().replace("Filter", "")));
     }
 
 }

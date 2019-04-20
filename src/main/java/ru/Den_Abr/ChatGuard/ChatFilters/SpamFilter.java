@@ -30,7 +30,6 @@ public class SpamFilter extends AbstractFilter {
 	public Violation checkMessage(String message, CGPlayer player, boolean justCheck) {
 		if (player.hasPermission("chatguard.ignore.spam"))
 			return null;
-		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": Hello!");
 		String checkMessage = message;
 		if (Settings.isHardMode()) {
 			checkMessage = checkMessage.replace(" ", "");

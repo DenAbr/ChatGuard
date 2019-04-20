@@ -10,12 +10,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventPriority;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 
 import ru.Den_Abr.ChatGuard.ChatGuardPlugin;
@@ -44,7 +48,7 @@ public class Settings {
     private static String replacement;
     private static EventPriority prior;
 
-    private static Map<String, Integer> commands = new HashMap<>();
+    private static Map<String, Integer> checkCommands = new HashMap<>();
     private static Map<String, String> reasons = new HashMap<>();
     private static Map<String, String> substitutions = new HashMap<>();
 
@@ -92,8 +96,9 @@ public class Settings {
         replacement = config.getString("Messages.replacement");
         prior = EventPriority.valueOf(config.getString("Other settings.event priority").toUpperCase());
         if (prior == null) {
-            ChatGuardPlugin.getLog().warning("Wrong priority "
-                    + config.getString("Other settings.event priority").toUpperCase() + "! Using HIGHEST");
+            ChatGuardPlugin.getLog()
+                    .warning("Wrong priority " + config.getString("Other settings.event priority").toUpperCase()
+                            + "! Using HIGHEST");
             prior = EventPriority.HIGHEST;
         }
 
@@ -101,12 +106,12 @@ public class Settings {
         debugLevel = config.getInt("Other settings.debug level");
         cooldown = config.getInt("flood settings.message cooldown");
 
-        commands.clear();
+        checkCommands.clear();
         for (String command : config.getStringList("Other settings.check commands")) {
             String[] cmd = command.split(Pattern.quote(":"));
             if (cmd.length != 2 || !Utils.isInt(cmd[1]) || Integer.parseInt(cmd[1]) < 0)
                 continue;
-            commands.put(cmd[0].toLowerCase(), Integer.parseInt(cmd[1]));
+            checkCommands.put(cmd[0].toLowerCase(), Integer.parseInt(cmd[1]));
         }
         reasons.clear();
         for (String key : config.getConfigurationSection("Punishment settings.reasons").getKeys(false)) {
@@ -126,6 +131,32 @@ public class Settings {
 
         if (debugLevel > 0) {
             ChatGuardPlugin.debug(1, "Debug level: " + getDebugLevel());
+        }
+        Bukkit.getScheduler().runTaskLater(pl, Settings::removeAliases, 20); // executes after all plugins start
+    }
+
+    private static void removeAliases() {
+        Map<String, Integer> copy = ImmutableMap.copyOf(checkCommands);
+        checkCommands.clear();
+        for (Entry<String, Integer> entry : copy.entrySet()) {
+            String command = entry.getKey();
+            if (command.startsWith("/") && command.length() > 1) {
+                command = command.substring(1);
+            }
+            String origCommand = Utils.getOriginalCommand(command);
+            if (!checkCommands.containsKey(origCommand)) {
+                if (!origCommand.equalsIgnoreCase(command))
+                    ChatGuardPlugin.debug(0, "Replaced alias " + command + " of command " + origCommand);
+                checkCommands.put(origCommand, entry.getValue());
+            }
+        }
+        if (!checkCommands.equals(copy)) {
+            config.set("Other settings.check commands",
+                    checkCommands.entrySet()
+                            .stream()
+                            .map(e -> e.getKey() + ":" + e.getValue())
+                            .collect(Collectors.toList()));
+            saveConfig();
         }
     }
 
@@ -182,7 +213,7 @@ public class Settings {
     }
 
     public static Map<String, Integer> getCheckCommands() {
-        return commands;
+        return checkCommands;
     }
 
     public static int getMaxWarnCount(String sec) {

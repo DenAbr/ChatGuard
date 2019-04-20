@@ -69,24 +69,24 @@ public class Utils {
 		return ns;
 	}
 
-	public static String getOriginalCommand(String lowerCase) {
-		String[] splitted = lowerCase.split(" ");
+	public static String getOriginalCommand(String fullCmd) {
+		String[] splitted = fullCmd.split(" ");
 		String first = splitted[0];
 
-        Command pc = null;
+        Command cmd = null;
         try {
             SimpleCommandMap scm = (SimpleCommandMap) getFromField(Bukkit.getServer(), "commandMap");
-            pc = scm.getCommand(first);
+            cmd = scm.getCommand(first);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
 		
-		if (pc != null) {
-			first = pc.getName();
+		if (cmd != null) {
+			first = cmd.getName();
 			splitted[0] = first;
-			lowerCase = StringUtils.join(splitted, ' ');
+			fullCmd = StringUtils.join(splitted, ' ');
 		}
-		return lowerCase;
+		return fullCmd;
 	}
 
     public static Object getFromField(Object instance, String field) throws ReflectiveOperationException {

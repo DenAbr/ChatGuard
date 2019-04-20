@@ -94,7 +94,7 @@ Other settings:
     check items: true
     # check player's command for swearing, capsing and flooding
     # to disable this set value to []. Number after colon means how many arguements in command we should skip
-    check commands: ['/me:0', '/msg:1', '/tell:1', '/w:1', '/r:0']
+    check commands: ['me:0', 'msg:1', 'tell:1', 'w:1', 'r:0']
     # may be useful if you find a bug and want report it to developer
     debug level: 0
     # if traditional messages listening system doesnt work(or smth else) plugin can listen packets

@@ -73,8 +73,11 @@ public class PlayerListener implements Listener {
         }
 
         if (player.isMuted()) {
-            player.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason()).replace(
-                    "{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
+            player.getPlayer()
+                    .sendMessage(Message.UR_MUTED.get()
+                            .replace("{REASON}", player.getMuteReason())
+                            .replace("{TIME}",
+                                    Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
             info.cancel(true);
             return info;
         }
@@ -125,18 +128,22 @@ public class PlayerListener implements Listener {
             cutMessage = StringUtils.join(Arrays.copyOfRange(words, offset, words.length), ' ');
         } else {
             ChatGuardPlugin.debug(1,
-                    "Something wrong with '" + message + "'. Offset: " + offset + ", array lenght: " + words.length);
+                    "Incomplete command '" + message + "'. Offset: " + offset + ", array lenght: " + words.length);
         }
         ChatGuardPlugin.debug(2, "Fixed part: " + cutMessage, "Skipped part: " + skipped);
 
+        comand = "/" + comand;
         comand += " " + skipped;
 
         if (cutMessage.isEmpty() && offset > 1)
             return null;
 
         if (player.isMuted()) {
-            player.getPlayer().sendMessage(Message.UR_MUTED.get().replace("{REASON}", player.getMuteReason()).replace(
-                    "{TIME}", Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
+            player.getPlayer()
+                    .sendMessage(Message.UR_MUTED.get()
+                            .replace("{REASON}", player.getMuteReason())
+                            .replace("{TIME}",
+                                    Utils.getTimeInMaxUnit(player.getMuteTime() - System.currentTimeMillis())));
             MessageInfo info = new MessageInfo(message, player);
             info.cancel(true);
             return info;
@@ -162,6 +169,9 @@ public class PlayerListener implements Listener {
 
     public static String getPMCommand(String mes) {
         String comand = mes.split(" ")[0].toLowerCase();
+        if (comand.equals("/"))
+            return null;
+        comand = comand.substring(1);
         comand = Utils.getOriginalCommand(comand);
         ChatGuardPlugin.debug(2, "Command: " + comand, "Commands list: " + Settings.getCheckCommands());
         if (!Settings.getCheckCommands().containsKey(comand)) {

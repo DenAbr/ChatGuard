@@ -33,7 +33,6 @@ public class SwearFilter extends AbstractFilter {
 	public Violation checkMessage(String message, CGPlayer player, boolean justCheck) {
 		if (player.hasPermission("chatguard.ignore.swear"))
 			return null;
-		ChatGuardPlugin.debug(2, getClass().getSimpleName() + ": Hello!");
 		String checkMessage = message;
 		if (Settings.isHardMode()) {
 			checkMessage = checkMessage.replaceAll(" ", "").replaceAll("[^A-Za-zА-Яа-яà-ÿÀ-ß]", "");
